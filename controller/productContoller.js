@@ -113,6 +113,10 @@ exports.updateProductById = async (req, res) => {
             req.body.productImage = req.files['productImage'].map(file => file.path);
         }
 
+        if (req.body.totalPrice && req.body.discount) {
+            req.body.price = req.body.totalPrice - req.body.discount;
+        }
+
         updateProductId = await product.findByIdAndUpdate(id, { ...req.body }, { new: true });
 
         return res.status(200).json({ status: 200, success: true, message: "Product Updated SuccessFully...", data: updateProductId })
