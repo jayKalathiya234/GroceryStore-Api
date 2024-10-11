@@ -2,19 +2,21 @@ const product = require('../models/productModels')
 
 exports.createProduct = async (req, res) => {
     try {
-        let { productName, categoryId, subCategoryId, quantity, productImage, description, price, productDetails, FSSAILicense, NutrientValueAndBenefits, StorageTemperature, Decription, disclaimer, customerCareDetails, returnPolicy, expiryDate, SellerFSSAI } = req.body
+        let { productName, categoryId, subCategoryId, quantity, totalPrice, productImage, weight, description, discount, productDetails, FSSAILicense, NutrientValueAndBenefits, StorageTemperature, disclaimer, customerCareDetails, returnPolicy, expiryDate, SellerFSSAI } = req.body;
 
-        let existProduct = await product.findOne({ productName })
+        let existProduct = await product.findOne({ productName });
 
         if (existProduct) {
-            return res.status(409).json({ status: 409, success: false, message: "Product Already Added..." })
+            return res.status(409).json({ status: 409, success: false, message: "Product Already Added..." });
         }
 
-        if (!req.files) {
-            return res.status(404).json({ status: 404, success: false, message: "Product Image Is Required" })
+        if (!req.files || !req.files['productImage']) {
+            return res.status(404).json({ status: 404, success: false, message: "Product Image Is Required" });
         }
 
         const files = req.files['productImage'];
+
+        const price = totalPrice - discount;
 
         existProduct = await product.create({
             productName,
@@ -23,11 +25,13 @@ exports.createProduct = async (req, res) => {
             productImage: files.map(file => file.path),
             description,
             price,
+            weight,
+            discount,
+            totalPrice,
             quantity,
             productDetails,
             NutrientValueAndBenefits,
             StorageTemperature,
-            Decription,
             disclaimer,
             FSSAILicense,
             customerCareDetails,
@@ -36,11 +40,11 @@ exports.createProduct = async (req, res) => {
             SellerFSSAI
         });
 
-        return res.status(201).json({ status: 201, success: true, message: "Product Create SuccessFully....", data: existProduct })
+        return res.status(201).json({ status: 201, success: true, message: "Product Created Successfully...", data: existProduct });
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ status: 500, success: false, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message });
     }
 }
 

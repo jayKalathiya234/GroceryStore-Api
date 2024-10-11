@@ -19,6 +19,18 @@ const productSchema = mongoose.Schema({
         type: String,
         required: true
     }],
+    totalPrice: {
+        type: Number,
+        require: true
+    },
+    weight: {
+        type: String,
+        require: true
+    },
+    discount: {
+        type: String,
+        require: true
+    },
     price: {
         type: Number,
         required: true
