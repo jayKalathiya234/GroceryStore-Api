@@ -4,9 +4,9 @@ const upload = require('../helper/imageUplode');
 const { createCategory, getAllCategories, getCategoryById, updateCategoryById, deleteCategoryById } = require('../controller/categoryController');
 const { createSubCategory, getAllSubCategory, getSubCategoryById, updateSubCategoryById, deleteSubCategoryById } = require('../controller/subCategoryController');
 const { createProduct, getAllProduct, getProductById, updateProductById, deleteProductById, getProductByCategory } = require('../controller/productContoller');
-const { createWishList, getAllWishList, getWishListById, deleteWishListById } = require('../controller/wishListController');
+const { createWishList, getAllWishList, getWishListById, deleteWishListById, getAllMyWishList } = require('../controller/wishListController');
 const { createAddress, getAllAddress, getAddressById, deleteAddressById, updateAddressById } = require('../controller/addressController');
-const { createCartData, getAllCartData, getCartDataById, updateCartDataById, updateCartQuantityById, deleteCartDataById } = require('../controller/cartController');
+const { createCartData, getAllCartData, getCartDataById, updateCartDataById, updateCartQuantityById, deleteCartDataById, getAllMyCarts } = require('../controller/cartController');
 const { createRating, getAllRatings, getRatingDataById, updateRatingDataById, deleteRatingDataById } = require('../controller/ratingController');
 const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, updateCoupenStatusById, deleteCoupenById } = require('../controller/coupenContoller');
 const { createOrder, getAllOrders, getOrderById, updateOrderById, deleteOrderById, getMyOrders, changeOrderStatusById, cancelOrder } = require('../controller/orderController');
@@ -57,10 +57,11 @@ indexRoutes.get('/getProductByCategory/:id', getProductByCategory)
 
 // wishList Routes
 
-indexRoutes.post('/createWishList', auth(['user']), createWishList)
-indexRoutes.get('/allWishList', auth(['user']), getAllWishList)
+indexRoutes.post('/createWishList', createWishList)
+indexRoutes.get('/allWishList', getAllWishList)
 indexRoutes.get('/getWishList/:id', getWishListById)
 indexRoutes.delete('/deleteWishList/:id', deleteWishListById);
+indexRoutes.get('/allMyWishList/:id', getAllMyWishList);
 
 // Delivery address Routes
 
@@ -73,12 +74,13 @@ indexRoutes.delete('/deleteAddress/:id', deleteAddressById);
 
 // Cart Routes
 
-indexRoutes.post('/addToCart', auth(['user']), createCartData);
-indexRoutes.get('/allCarts', auth(['user']), getAllCartData);
+indexRoutes.post('/addToCart', createCartData);
+indexRoutes.get('/allCarts', getAllCartData);
 indexRoutes.get('/getCart/:id', getCartDataById);
 indexRoutes.put('/updateCart/:id', updateCartDataById);
 indexRoutes.put('/updateCartQuantity/:id', updateCartQuantityById);
 indexRoutes.delete('/deleteCart/:id', deleteCartDataById);
+indexRoutes.get('/allMyCarts/:id', getAllMyCarts);
 
 // Rating Routes
 
@@ -99,8 +101,8 @@ indexRoutes.delete('/deleteCoupen/:id', deleteCoupenById)
 
 // Order Routes 
 
-indexRoutes.post('/createOrder', auth(['user']), createOrder)
-indexRoutes.get('/allOrders', auth(['user']), getAllOrders)
+indexRoutes.post('/createOrder', createOrder)
+indexRoutes.get('/allOrders', getAllOrders)
 indexRoutes.get('/getOrder/:id', getOrderById)
 indexRoutes.put('/updateOrder/:id', updateOrderById);
 indexRoutes.delete('/deleteOrder/:id', deleteOrderById);

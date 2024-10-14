@@ -2,16 +2,16 @@ const cart = require('../models/cartModels')
 
 exports.createCartData = async (req, res) => {
     try {
-        let { productId, quantity } = req.body
-        console.log(req.user);
-        let existCartData = await cart.findOne({ userId: req.user._id, productId })
+        let { userId, productId, quantity } = req.body
+
+        let existCartData = await cart.findOne({ userId, productId })
 
         if (existCartData) {
             return res.status(409).json({ status: 409, success: false, message: "Cart Data Alredy Added..." })
         }
 
         existCartData = await cart.create({
-            userId: req.user._id,
+            userId,
             productId,
             quantity
         });
@@ -35,7 +35,7 @@ exports.getAllCartData = async (req, res) => {
 
         let paginatedCartData;
 
-        paginatedCartData = await cart.find({ userId: req.user._id });
+        paginatedCartData = await cart.find();
 
         let count = paginatedCartData.length
 
@@ -51,6 +51,23 @@ exports.getAllCartData = async (req, res) => {
 
         return res.status(200).json({ status: 200, success: true, totalCarts: count, message: "All Cart Data Found SuccessFully...", data: paginatedCartData })
 
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, success: false, message: error.message })
+    }
+}
+
+exports.getAllMyCarts = async (req, res) => {
+    try {
+        let id = req.params.id
+
+        let getMyCarts = await cart.find({ userId: id })
+
+        if (!getMyCarts) {
+            return res.status(404).json({ status: 404, success: false, message: "Carts Not Found" })
+        }
+
+        return res.status(200).json({ status: 200, success: true, message: "All My Carts Found SuccessFully...", data: getMyCarts })
     } catch (error) {
         console.log(error)
         return res.status(500).json({ status: 500, success: false, message: error.message })

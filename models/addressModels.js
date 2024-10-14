@@ -9,7 +9,19 @@ const addressSchema = mongoose.Schema({
     address: {
         type: String,
         required: true
-    }
+    },
+    yourName: {
+        type: String,
+        require: true
+    },
+    yourPhoneNumber: {
+        type: String,
+        require: true
+    },
+    saveAddressAs: {
+        type: String,
+        enum: ['Home', "Work", "Hotel", "other"]
+    },
 }, {
     timestamps: true,
     versionKey: false
