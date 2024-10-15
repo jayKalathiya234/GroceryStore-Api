@@ -2,9 +2,9 @@ const address = require('../models/addressModels')
 
 exports.createAddress = async (req, res) => {
     try {
-        let { userId, houseNo, floor, area, localtiy, yourName, yourPhoneNumber, saveAddressAs, orderFor } = req.body
+        let { userId, houseNo, floor, area, localitiy, yourName, yourPhoneNumber, saveAddressAs, orderFor } = req.body
 
-        addressData = `${houseNo},${floor},${area},${localtiy}`
+        addressData = `${houseNo},${floor},${area},${localitiy}`
 
         createAddress = await address.create({
             userId,
