@@ -92,10 +92,10 @@ indexRoutes.delete('/deleteRating/:id', deleteRatingDataById);
 
 // coupen Routes 
 
-indexRoutes.post('/createCoupen', createCoupen);
+indexRoutes.post('/createCoupen', upload.single('coupenImage'), createCoupen);
 indexRoutes.get('/allCoupens', getAllCoupens);
 indexRoutes.get('/getCoupen/:id', getCoupenById);
-indexRoutes.put('/updateCoupen/:id', updateCoupenById);
+indexRoutes.put('/updateCoupen/:id', upload.single('coupenImage'), updateCoupenById);
 indexRoutes.put('/updateCoupenStatus/:id', updateCoupenStatusById);
 indexRoutes.delete('/deleteCoupen/:id', deleteCoupenById)
 

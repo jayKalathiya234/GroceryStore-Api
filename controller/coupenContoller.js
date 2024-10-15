@@ -2,7 +2,7 @@ const coupen = require('../models/couponModels')
 
 exports.createCoupen = async (req, res) => {
     try {
-        let { coupenName, coupenCode, coupenDiscount } = req.body
+        let { coupenName, coupenCode, coupenDiscount, description, coupenImage } = req.body
 
         let existCoupen = await coupen.findOne({ coupenName })
 
@@ -10,10 +10,16 @@ exports.createCoupen = async (req, res) => {
             return res.status(409).json({ status: 409, success: false, message: "Coupen Alredy Added" })
         }
 
+        if (!req.file) {
+            return res.status(401).json({ status: 401, success: false, message: "Coupen Image Is Required" })
+        }
+
         existCoupen = await coupen.create({
             coupenName,
             coupenCode,
-            coupenDiscount
+            coupenDiscount,
+            description,
+            coupenImage: req.file.path
         });
 
         return res.status(201).json({ status: 201, success: true, message: "Coupen Created SuccessFully...", data: existCoupen })
@@ -83,6 +89,10 @@ exports.updateCoupenById = async (req, res) => {
 
         if (!updateCoupenId) {
             return res.status(404).json({ status: 404, success: false, message: "Coupen Not Found" })
+        }
+
+        if (req.file) {
+            req.body.coupenImage = req.file.path
         }
 
         updateCoupenId = await coupen.findByIdAndUpdate(id, { ...req.body }, { new: true })
