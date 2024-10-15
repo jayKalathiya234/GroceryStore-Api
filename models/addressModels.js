@@ -20,8 +20,14 @@ const addressSchema = mongoose.Schema({
     },
     saveAddressAs: {
         type: String,
-        enum: ['Home', "Work", "Hotel", "other"]
+        enum: ['Home', "Work", "Hotel", "other"],
+        require: true
     },
+    orderFor: {
+        type: String,
+        enum: ['Myself', "Someone else"],
+        require: true
+    }
 }, {
     timestamps: true,
     versionKey: false

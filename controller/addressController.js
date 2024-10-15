@@ -2,7 +2,7 @@ const address = require('../models/addressModels')
 
 exports.createAddress = async (req, res) => {
     try {
-        let { userId, houseNo, floor, area, localtiy, yourName, yourPhoneNumber, saveAddressAs } = req.body
+        let { userId, houseNo, floor, area, localtiy, yourName, yourPhoneNumber, saveAddressAs, orderFor } = req.body
 
         addressData = `${houseNo},${floor},${area},${localtiy}`
 
@@ -11,7 +11,8 @@ exports.createAddress = async (req, res) => {
             address: addressData,
             yourName,
             yourPhoneNumber,
-            saveAddressAs
+            saveAddressAs,
+            orderFor
         });
 
         return res.status(201).json({ status: 201, success: true, message: 'Delivery Address Created SuccessFully...', data: createAddress })
