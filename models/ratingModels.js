@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const ratingSchema = mongoose.Schema({
     name: {
         type: String,
+        default: "Groccery Customer",
         required: true
     },
     productId: {

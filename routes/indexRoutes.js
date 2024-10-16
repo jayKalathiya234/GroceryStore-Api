@@ -13,6 +13,7 @@ const { createOrder, getAllOrders, getOrderById, updateOrderById, deleteOrderByI
 const { userLogin } = require('../auth/login');
 const { auth } = require('../helper/authToken');
 const { createSpecialDeals, getAllSpecialDeals, getSpecialDealById, updateSpecialDealById, deleteSpecialDealById } = require('../controller/specialDealsController');
+const { createMoreToExplore, getAllMoreToExplores, getMoreToExploreById, updateMoretoExploreById, deleteMoreToExploreById } = require('../controller/moreToExpolre.contoller');
 
 const indexRoutes = express.Router();
 
@@ -127,5 +128,13 @@ indexRoutes.post('/verifyOtp', verifyOtp);
 indexRoutes.post('/generateOtp', generateOtp);
 indexRoutes.post('/verifyGenereOtp', verifyGenerateOtp);
 indexRoutes.post('/resentOtp', resentOtp);
+
+// moreToExlpre Routes
+
+indexRoutes.post('/createMoreToExplore', upload.single('moreToExploreImage'), createMoreToExplore);
+indexRoutes.get('/getAllMoreToExplore', getAllMoreToExplores);
+indexRoutes.get('/getMoreToExplore/:id', getMoreToExploreById);
+indexRoutes.put('/updateMoreToExplore/:id', upload.single('moreToExploreImage'), updateMoretoExploreById);
+indexRoutes.delete('/deleteMoreToExplore/:id', deleteMoreToExploreById);
 
 module.exports = indexRoutes;   
