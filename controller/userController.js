@@ -6,6 +6,7 @@ const Order = require('../models/orderModels');
 const Product = require('../models/productModels');
 const specialDeals = require('../models/specialDealsModels');
 const jwt = require('jsonwebtoken')
+const moreToExplore = require('../models/moreToExplore.models');
 
 exports.createAdminUser = async (req, res) => {
     try {
@@ -187,6 +188,8 @@ exports.dashBoard = async (req, res) => {
 
         const orders = await Order.find().populate('orderItems.productId')
 
+        const moreToExplores = await moreToExplore.find();
+
         const productSales = {};
 
         orders.forEach(order => {
@@ -235,7 +238,8 @@ exports.dashBoard = async (req, res) => {
             SpecialDeals,
             bestSeller: bestSellingProducts,
             freshVegetables: freshVegetablesProducts,
-            freshFruits: freshFruitsProducts
+            freshFruits: freshFruitsProducts,
+            MoreToExplore: moreToExplores
         };
 
         return res.status(200).json({ status: 200, success: true, status: true, message: "DashBoard Data Found SuccessFully....", data: categorizedData });
