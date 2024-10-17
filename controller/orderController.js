@@ -2,10 +2,53 @@ const order = require('../models/orderModels');
 const cart = require('../models/cartModels');
 const product = require('../models/productModels');
 const coupen = require('../models/couponModels')
+const orderNoTracker = require('../models/orderSequanceValue.models')
+
+const generateOrderId = async () => {
+    const currentPrefix = await orderNoTracker.findOne({}, {}, { sort: { 'prefix': -1 } });
+
+    let prefix = currentPrefix ? currentPrefix.prefix : 'AA';
+    let orderId = currentPrefix ? currentPrefix.lastSequenceNumber + 1 : 1;
+
+    const incrementPrefix = (prefix) => {
+        let first = prefix.charCodeAt(0);
+        let second = prefix.charCodeAt(1);
+
+        if (second < 90) {
+            second++;
+        } else {
+            second = 65;
+            if (first < 90) {
+                first++;
+            } else {
+                throw new Error('Maximum prefix reached');
+            }
+        }
+
+        return String.fromCharCode(first) + String.fromCharCode(second);
+    };
+
+    if (orderId > 999999999) {
+        prefix = incrementPrefix(prefix);
+        orderId = 1;
+    }
+
+    let prefixData = await orderNoTracker.findOne({ prefix });
+
+    if (!prefixData) {
+        prefixData = await orderNoTracker.create({ prefix, lastSequenceNumber: 0 });
+    }
+
+    await orderNoTracker.updateOne({ prefix }, { lastSequenceNumber: orderId });
+
+    const number = String(orderId).padStart(9, '0');
+
+    return prefix + number;
+};
 
 exports.createOrder = async (req, res) => {
     try {
-        let { userId, orderItems, productId, quantity, address, coupenId, paymentMethod, status, subTotal, discount, totalAmount = 0 } = req.body
+        let { userId, orderId, orderItems, productId, quantity, address, coupenId, paymentMethod, status, subTotal } = req.body
 
         orderItems = await cart.find({ userId })
 
@@ -13,6 +56,12 @@ exports.createOrder = async (req, res) => {
             return res.status(404).json({ status: 404, success: false, message: "Cart Item Not Found" })
         }
 
+        if (!orderId) {
+            orderId = await generateOrderId();
+        }
+
+        let discount = 0
+        let totalAmount = 0
         let coupens;
 
         if (coupenId) {
@@ -38,21 +87,20 @@ exports.createOrder = async (req, res) => {
             totalAmount += products.price * item.quantity
         }
 
-        subTotal = totalAmount
-
         const discountAmount = (totalAmount * (discount / 100))
 
         totalAmount -= discountAmount
 
         cartItmems = await order.create({
             userId,
+            orderId,
             orderItems,
             address,
             paymentMethod,
             coupenId,
             discount: discountAmount,
             status: "pending",
-            subTotal,
+            subTotal: totalAmount + discountAmount,
             totalAmount
         });
 
