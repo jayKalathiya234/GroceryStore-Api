@@ -7,8 +7,7 @@ const userSchema = mongoose.Schema({
     },
     email: {
         type: String,
-        require: true,
-        unique: true
+        require: true
     },
     password: {
         type: String,
@@ -21,7 +20,7 @@ const userSchema = mongoose.Schema({
     address: {
         type: String,
         require: true
-    }, 
+    },
     image: {
         type: String,
         require: true
@@ -32,6 +31,19 @@ const userSchema = mongoose.Schema({
     role: {
         type: String,
         enum: ["admin", "user"]
+    },
+    uid: {
+        type: String,
+        require: true
+    },
+    username: {
+        type: String,
+        require: true
+    },
+
+    image: {
+        type: String,
+        require: true
     }
 }, {
     timestamps: true,
