@@ -5,11 +5,11 @@ const specialDealsSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    subTitle: {
-        type: String,
-        required: true
+    productId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'product'
     },
-    dealsImage: {
+    subTitle: {
         type: String,
         required: true
     },

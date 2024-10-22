@@ -1,5 +1,5 @@
 const express = require('express');
-const { createAdminUser, createUser, getAllUsers, getUserById, updateUserById, deleteUserById, dashBoard, loginWithMobileNo, verifyOtp, generateOtp, verifyGenerateOtp, resentOtp } = require('../controller/userController');
+const { createAdminUser, createUser, getAllUsers, getUserById, updateUserById, deleteUserById, dashBoard, loginWithMobileNo, verifyOtp, generateOtp, verifyGenerateOtp, resentOtp, staticResentOtp } = require('../controller/userController');
 const upload = require('../helper/imageUplode');
 const { createCategory, getAllCategories, getCategoryById, updateCategoryById, deleteCategoryById } = require('../controller/categoryController');
 const { createSubCategory, getAllSubCategory, getSubCategoryById, updateSubCategoryById, deleteSubCategoryById } = require('../controller/subCategoryController');
@@ -113,21 +113,11 @@ indexRoutes.put('/cancelOrder/:id', cancelOrder);
 
 // Special Deals Routes
 
-indexRoutes.post('/createSpecialDeal', upload.single('dealsImage'), createSpecialDeals);
+indexRoutes.post('/createSpecialDeal', createSpecialDeals);
 indexRoutes.get('/allSpecialDeal', getAllSpecialDeals);
 indexRoutes.get('/getSpecialDeal/:id', getSpecialDealById)
-indexRoutes.put('/updateSpecialDeal/:id', upload.single('dealsImage'), updateSpecialDealById);
+indexRoutes.put('/updateSpecialDeal/:id', updateSpecialDealById);
 indexRoutes.delete('/deleteSpecialDeal/:id', deleteSpecialDealById);
-
-// Login With Mobile No
-
-indexRoutes.post('/mobileNoLogin', loginWithMobileNo);
-indexRoutes.post('/verifyOtp', verifyOtp);
-
-
-indexRoutes.post('/generateOtp', generateOtp);
-indexRoutes.post('/verifyGenereOtp', verifyGenerateOtp);
-indexRoutes.post('/resentOtp', resentOtp);
 
 // moreToExlpre Routes
 
@@ -136,5 +126,17 @@ indexRoutes.get('/getAllMoreToExplore', getAllMoreToExplores);
 indexRoutes.get('/getMoreToExplore/:id', getMoreToExploreById);
 indexRoutes.put('/updateMoreToExplore/:id', upload.single('moreToExploreImage'), updateMoretoExploreById);
 indexRoutes.delete('/deleteMoreToExplore/:id', deleteMoreToExploreById);
+
+// Login With Mobile No
+
+indexRoutes.post('/mobileNoLogin', loginWithMobileNo);
+indexRoutes.post('/verifyOtp', verifyOtp);
+indexRoutes.post('/staticResendotp', staticResentOtp);
+
+
+indexRoutes.post('/generateOtp', generateOtp);
+indexRoutes.post('/verifyGenereOtp', verifyGenerateOtp);
+indexRoutes.post('/resentOtp', resentOtp);
+
 
 module.exports = indexRoutes;   

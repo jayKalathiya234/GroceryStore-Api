@@ -251,7 +251,6 @@ exports.dashBoard = async (req, res) => {
 
 let fixOtp = 1234
 
-
 exports.loginWithMobileNo = async (req, res) => {
     try {
         const { mobileNo } = req.body;
@@ -265,12 +264,14 @@ exports.loginWithMobileNo = async (req, res) => {
         if (!userMobileNo) {
             userMobileNo = await user.create({
                 mobileNo,
-                role: 'user'
             });
-            console.log(userMobileNo);
         }
 
-        return res.status(200).json({ status: 200, success: true, message: "OTP Sent Successfully...", otp: fixOtp });
+        userMobileNo.otp = fixOtp
+
+        await userMobileNo.save();
+
+        return res.status(200).json({ status: 200, success: true, message: "OTP Sent Successfully..." });
 
     } catch (error) {
         console.log(error);
@@ -288,9 +289,13 @@ exports.verifyOtp = async (req, res) => {
             return res.status(401).json({ status: 401, success: false, message: "MobileNo Not Found" })
         }
 
-        if (otp !== fixOtp) {
+        if (otp !== checMobileNo.otp) {
             return res.status(401).json({ status: 401, success: false, message: "Invalid Otp" })
         }
+
+        checMobileNo.otp = undefined;
+
+        await checMobileNo.save();
 
         let token = jwt.sign({ _id: checMobileNo._id }, process.env.SECRET_KEY, { expiresIn: '1D' })
 
@@ -299,6 +304,28 @@ exports.verifyOtp = async (req, res) => {
     } catch (error) {
         console.log(error)
         return res.status(500).json({ status: 500, success: false, message: error.message })
+    }
+}
+
+exports.staticResentOtp = async (req, res) => {
+    try {
+        const { mobileNo } = req.body;
+
+        if (!mobileNo) {
+            return res.status(401).json({ status: 401, success: false, message: "Mobile No Is Required" });
+        }
+
+        let userMobileNo = await user.findOne({ mobileNo });
+
+        userMobileNo.otp = 5678
+
+        await userMobileNo.save();
+
+        return res.status(200).json({ status: 200, success: true, message: "OTP Sent Successfully..." });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ status: 500, success: false, message: error.message });
     }
 }
 

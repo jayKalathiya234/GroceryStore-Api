@@ -2,7 +2,7 @@ const specialDeals = require('../models/specialDealsModels')
 
 exports.createSpecialDeals = async (req, res) => {
     try {
-        let { title, subTitle, dealsImage, discount } = req.body
+        let { title, subTitle, productId, discount } = req.body
 
         let existSpecialDeals = await specialDeals.findOne({ title })
 
@@ -10,14 +10,10 @@ exports.createSpecialDeals = async (req, res) => {
             return res.status(409).json({ status: 409, success: false, message: "SpecialDeal Alredy Added.." })
         }
 
-        if (!req.file) {
-            return res.status(401).json({ status: 401, success: false, message: "DealsImage Is Required" })
-        }
-
         existSpecialDeals = await specialDeals.create({
             title,
             subTitle,
-            dealsImage: req.file.path,
+            productId,
             discount
         });
 
@@ -88,10 +84,6 @@ exports.updateSpecialDealById = async (req, res) => {
 
         if (!updateSpecialDealId) {
             return res.status(404).json({ status: 404, success: false, message: "SpecialDeal Not Found" })
-        }
-
-        if (req.file) {
-            req.body.dealsImage = req.file.path
         }
 
         updateSpecialDealId = await specialDeals.findByIdAndUpdate(id, { ...req.body }, { new: true })
