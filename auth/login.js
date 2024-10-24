@@ -18,9 +18,13 @@ exports.userLogin = async (req, res) => {
             })
         }
 
+        if (req.file) {
+            checkUser.image = imageUrl
+        }
+
         let token = jwt.sign({ _id: checkUser._id }, process.env.SECRET_KEY, { expiresIn: '1D' })
 
-        return res.status(200).json({ status: 200, success: true, message: "User Login SuccessFully....", data: { id: checkUser._id, email: checkUser.email, username: checkUser.username }, token: token });
+        return res.status(200).json({ status: 200, success: true, message: "User Login SuccessFully....", data: { image: checkUser.image, id: checkUser._id, email: checkUser.email, username: checkUser.username }, token: token });
 
     } catch (error) {
         console.log(error)
