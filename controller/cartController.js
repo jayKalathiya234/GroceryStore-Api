@@ -1,4 +1,5 @@
 const cart = require('../models/cartModels')
+const product = require('../models/productModels');
 
 exports.createCartData = async (req, res) => {
     try {
@@ -7,7 +8,11 @@ exports.createCartData = async (req, res) => {
         let existCartData = await cart.findOne({ userId, productId })
 
         if (existCartData) {
-            return res.status(409).json({ status: 409, success: false, message: "Cart Data Alredy Added..." })
+            existCartData.quantity += quantity
+
+            await existCartData.save();
+
+            return res.status(200).json({ status: 200, success: true, message: "Cart Data Updated Successfully...", data: existCartData })
         }
 
         existCartData = await cart.create({
@@ -61,7 +66,7 @@ exports.getAllMyCarts = async (req, res) => {
     try {
         let id = req.params.id
 
-        let getMyCarts = await cart.find({ userId: id })
+        let getMyCarts = await cart.find({ userId: id }).populate('productId');
 
         if (!getMyCarts) {
             return res.status(404).json({ status: 404, success: false, message: "Carts Not Found" })

@@ -113,3 +113,21 @@ exports.deleteAddressById = async (req, res) => {
         return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
+
+exports.getMyAddress = async (req, res) => {
+    try {
+        let id = req.params.id
+
+        let getUserAddress = await address.find({ userId: id })
+
+        if (!getUserAddress) {
+            return res.status(404).json({ status: 404, success: false, message: "Address Not Found" })
+        }
+
+        return res.status(200).json({ status: 200, success: true, message: "Address Found SuccessFully...", data: getUserAddress });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, success: false, message: error.message })
+    }
+}

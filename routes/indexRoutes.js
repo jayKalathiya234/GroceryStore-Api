@@ -5,7 +5,7 @@ const { createCategory, getAllCategories, getCategoryById, updateCategoryById, d
 const { createSubCategory, getAllSubCategory, getSubCategoryById, updateSubCategoryById, deleteSubCategoryById } = require('../controller/subCategoryController');
 const { createProduct, getAllProduct, getProductById, updateProductById, deleteProductById, getProductByCategory } = require('../controller/productContoller');
 const { createWishList, getAllWishList, getWishListById, deleteWishListById, getAllMyWishList } = require('../controller/wishListController');
-const { createAddress, getAllAddress, getAddressById, deleteAddressById, updateAddressById } = require('../controller/addressController');
+const { createAddress, getAllAddress, getAddressById, deleteAddressById, updateAddressById, getMyAddress } = require('../controller/addressController');
 const { createCartData, getAllCartData, getCartDataById, updateCartDataById, updateCartQuantityById, deleteCartDataById, getAllMyCarts } = require('../controller/cartController');
 const { createRating, getAllRatings, getRatingDataById, updateRatingDataById, deleteRatingDataById } = require('../controller/ratingController');
 const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, updateCoupenStatusById, deleteCoupenById } = require('../controller/coupenContoller');
@@ -71,6 +71,7 @@ indexRoutes.get('/allAddress', getAllAddress);
 indexRoutes.get('/getAddress/:id', getAddressById);
 indexRoutes.put('/updateAddress/:id', updateAddressById)
 indexRoutes.delete('/deleteAddress/:id', deleteAddressById);
+indexRoutes.get('/getAllMyAddress/:id', getMyAddress)
 
 
 // Cart Routes
