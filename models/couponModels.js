@@ -31,6 +31,10 @@ const couponSchema = mongoose.Schema({
     active: {
         type: Boolean,
         default: true
+    },
+    type: {
+        type: String,
+        enum: ['perpercentage', 'fixedDiscount']
     }
 }, {
     timestamps: true,
