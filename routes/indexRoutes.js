@@ -10,17 +10,17 @@ const { createCartData, getAllCartData, getCartDataById, updateCartDataById, upd
 const { createRating, getAllRatings, getRatingDataById, updateRatingDataById, deleteRatingDataById } = require('../controller/ratingController');
 const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, updateCoupenStatusById, deleteCoupenById } = require('../controller/coupenContoller');
 const { createOrder, getAllOrders, getOrderById, updateOrderById, deleteOrderById, getMyOrders, changeOrderStatusById, cancelOrder } = require('../controller/orderController');
-const { userLogin } = require('../auth/login');
+const { userLogin, adminLogin } = require('../auth/login');
 const { auth } = require('../helper/authToken');
 const { createSpecialDeals, getAllSpecialDeals, getSpecialDealById, updateSpecialDealById, deleteSpecialDealById } = require('../controller/specialDealsController');
 const { createMoreToExplore, getAllMoreToExplores, getMoreToExploreById, updateMoretoExploreById, deleteMoreToExploreById } = require('../controller/moreToExpolre.contoller');
 
 const indexRoutes = express.Router();
 
-// login
+// login 
 
 indexRoutes.post('/login', userLogin)
-
+indexRoutes.post('/adminLogin', adminLogin);
 // User Routes
 
 indexRoutes.post('/createAdminUser', upload.single('image'), createAdminUser)
