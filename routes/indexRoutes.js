@@ -1,15 +1,15 @@
 const express = require('express');
-const { createAdminUser, createUser, getAllUsers, getUserById, updateUserById, deleteUserById, dashBoard, loginWithMobileNo, verifyOtp, generateOtp, verifyGenerateOtp, resentOtp, staticResentOtp } = require('../controller/userController');
+const { createAdminUser, createUser, getAllUsers, getUserById, updateUserById, deleteUserById, dashBoard, loginWithMobileNo, verifyOtp, generateOtp, verifyGenerateOtp, resentOtp, staticResentOtp, deleteAllUsers } = require('../controller/userController');
 const upload = require('../helper/imageUplode');
-const { createCategory, getAllCategories, getCategoryById, updateCategoryById, deleteCategoryById } = require('../controller/categoryController');
-const { createSubCategory, getAllSubCategory, getSubCategoryById, updateSubCategoryById, deleteSubCategoryById } = require('../controller/subCategoryController');
-const { createProduct, getAllProduct, getProductById, updateProductById, deleteProductById, getProductByCategory } = require('../controller/productContoller');
+const { createCategory, getAllCategories, getCategoryById, updateCategoryById, deleteCategoryById, deleteAllCatrgory } = require('../controller/categoryController');
+const { createSubCategory, getAllSubCategory, getSubCategoryById, updateSubCategoryById, deleteSubCategoryById, deleteAllSubCatrgory } = require('../controller/subCategoryController');
+const { createProduct, getAllProduct, getProductById, updateProductById, deleteProductById, getProductByCategory, deleteAllProducts } = require('../controller/productContoller');
 const { createWishList, getAllWishList, getWishListById, deleteWishListById, getAllMyWishList } = require('../controller/wishListController');
 const { createAddress, getAllAddress, getAddressById, deleteAddressById, updateAddressById, getMyAddress } = require('../controller/addressController');
 const { createCartData, getAllCartData, getCartDataById, updateCartDataById, updateCartQuantityById, deleteCartDataById, getAllMyCarts } = require('../controller/cartController');
-const { createRating, getAllRatings, getRatingDataById, updateRatingDataById, deleteRatingDataById } = require('../controller/ratingController');
-const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, updateCoupenStatusById, deleteCoupenById } = require('../controller/coupenContoller');
-const { createOrder, getAllOrders, getOrderById, updateOrderById, deleteOrderById, getMyOrders, changeOrderStatusById, cancelOrder } = require('../controller/orderController');
+const { createRating, getAllRatings, getRatingDataById, updateRatingDataById, deleteRatingDataById, deleteAllRatings } = require('../controller/ratingController');
+const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, updateCoupenStatusById, deleteCoupenById, deleteAllCoupens } = require('../controller/coupenContoller');
+const { createOrder, getAllOrders, getOrderById, updateOrderById, deleteOrderById, getMyOrders, changeOrderStatusById, cancelOrder, deleteAllOrders } = require('../controller/orderController');
 const { userLogin, adminLogin } = require('../auth/login');
 const { auth } = require('../helper/authToken');
 const { createSpecialDeals, getAllSpecialDeals, getSpecialDealById, updateSpecialDealById, deleteSpecialDealById } = require('../controller/specialDealsController');
@@ -21,6 +21,7 @@ const indexRoutes = express.Router();
 
 indexRoutes.post('/login', userLogin)
 indexRoutes.post('/adminLogin', adminLogin);
+
 // User Routes
 
 indexRoutes.post('/createAdminUser', upload.single('image'), createAdminUser)
@@ -30,6 +31,7 @@ indexRoutes.get('/getUser/:id', getUserById);
 indexRoutes.put('/updateUser/:id', upload.single('image'), updateUserById)
 indexRoutes.delete('/deleteUser/:id', deleteUserById);
 indexRoutes.get('/dashBoard', dashBoard);
+indexRoutes.delete('/deleteAllUsers', deleteAllUsers)
 
 // category routes 
 
@@ -38,6 +40,7 @@ indexRoutes.get('/AllCategory', getAllCategories);
 indexRoutes.get('/getCategory/:id', getCategoryById);
 indexRoutes.put('/updateCategory/:id', upload.fields([{ name: 'categoryImage' }, { name: 'vectorImage' }]), updateCategoryById);
 indexRoutes.delete('/deleteCategory/:id', deleteCategoryById);
+indexRoutes.delete('/deleteAllCategory', deleteAllCatrgory);
 
 // Sub Category Routes
 
@@ -46,6 +49,7 @@ indexRoutes.get('/AllSubCategory', getAllSubCategory);
 indexRoutes.get('/getSubCategory/:id', getSubCategoryById)
 indexRoutes.put('/updateSubCategory/:id', upload.single('subCategoryImage'), updateSubCategoryById);
 indexRoutes.delete('/deleteSubCategory/:id', deleteSubCategoryById)
+indexRoutes.delete('/deleteAllSubCategory', deleteAllSubCatrgory);
 
 // Product Routes
 
@@ -55,6 +59,7 @@ indexRoutes.get('/getProduct/:id', getProductById);
 indexRoutes.put('/updateProduct/:id', upload.fields([{ name: 'productImage' }]), updateProductById);
 indexRoutes.delete('/deleteProduct/:id', deleteProductById);
 indexRoutes.get('/getProductByCategory/:id', getProductByCategory)
+indexRoutes.delete('/deleteAllProducts', deleteAllProducts);
 
 // wishList Routes
 
@@ -73,7 +78,6 @@ indexRoutes.put('/updateAddress/:id', updateAddressById)
 indexRoutes.delete('/deleteAddress/:id', deleteAddressById);
 indexRoutes.get('/getAllMyAddress/:id', getMyAddress)
 
-
 // Cart Routes
 
 indexRoutes.post('/addToCart', createCartData);
@@ -91,6 +95,7 @@ indexRoutes.get('/allRating', getAllRatings);
 indexRoutes.get('/getRating/:id', getRatingDataById)
 indexRoutes.put('/updateRating/:id', updateRatingDataById);
 indexRoutes.delete('/deleteRating/:id', deleteRatingDataById);
+indexRoutes.delete('/deleteAllRating', deleteAllRatings);
 
 // coupen Routes 
 
@@ -100,6 +105,7 @@ indexRoutes.get('/getCoupen/:id', getCoupenById);
 indexRoutes.put('/updateCoupen/:id', upload.single('coupenImage'), updateCoupenById);
 indexRoutes.put('/updateCoupenStatus/:id', updateCoupenStatusById);
 indexRoutes.delete('/deleteCoupen/:id', deleteCoupenById)
+indexRoutes.delete('/deleteAllCoupens', deleteAllCoupens)
 
 // Order Routes 
 
@@ -111,6 +117,7 @@ indexRoutes.delete('/deleteOrder/:id', deleteOrderById);
 indexRoutes.get('/getMyOrder/:id', getMyOrders)
 indexRoutes.put('/changeOrderStatus/:id', changeOrderStatusById);
 indexRoutes.put('/cancelOrder/:id', cancelOrder);
+indexRoutes.delete('/deleteAllOrders', deleteAllOrders);
 
 // Special Deals Routes
 

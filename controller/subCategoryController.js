@@ -2,7 +2,7 @@ const subCategory = require('../models/subCategoryModels')
 
 exports.createSubCategory = async (req, res) => {
     try {
-        let { categoryId, subCategoryName, subCategoryImage } = req.body
+        let { categoryId, subCategoryName, subCategoryImage, status } = req.body
 
         let existSubCategory = await subCategory.findOne({ categoryId, subCategoryName })
 
@@ -17,7 +17,8 @@ exports.createSubCategory = async (req, res) => {
         existSubCategory = await subCategory.create({
             categoryId,
             subCategoryName,
-            subCategoryImage: req.file.path
+            subCategoryImage: req.file.path,
+            status
         });
 
         return res.status(201).json({ status: 201, success: true, message: "SubCategory Create SuccessFully...", data: existSubCategory })
@@ -116,6 +117,22 @@ exports.deleteSubCategoryById = async (req, res) => {
         await subCategory.findByIdAndDelete(id)
 
         return res.status(200).json({ status: 200, success: true, message: "Sub Category Delete SuccessFully..." })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, success: false, message: error.message })
+    }
+}
+
+exports.deleteAllSubCatrgory = async (req, res) => {
+    try {
+        let deleteSubCategory = await subCategory.deleteMany({});
+
+        if (deleteSubCategory.deletedCount === 0) {
+            return res.status(404).json({ status: 404, status: false, message: "subCategory Not found" });
+        }
+
+        return res.status(200).json({ status: 200, success: true, message: "All subCategory Delete SuccessFully..." })
 
     } catch (error) {
         console.log(error)

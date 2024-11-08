@@ -33,7 +33,7 @@ const productSchema = mongoose.Schema({
     },
     price: {
         type: Number,
-        required: true
+        require: true
     },
     quantity: {
         type: Number,
@@ -78,6 +78,11 @@ const productSchema = mongoose.Schema({
     SellerFSSAI: {
         type: String,
         require: true
+    },
+    status: {
+        type: Boolean,
+        require: true,
+        default: true
     }
 }, {
     timestamps: true,

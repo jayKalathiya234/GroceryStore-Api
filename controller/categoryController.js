@@ -2,7 +2,7 @@ const category = require('../models/categoryModels')
 
 exports.createCategory = async (req, res) => {
     try {
-        let { categoryName } = req.body
+        let { categoryName, status } = req.body
 
         let existCategory = await category.findOne({ categoryName })
 
@@ -19,7 +19,8 @@ exports.createCategory = async (req, res) => {
         existCategory = await category.create({
             categoryName,
             categoryImage: req.files['categoryImage'][0].path,
-            vectorImage: req.files['vectorImage'][0].path
+            vectorImage: req.files['vectorImage'][0].path,
+            status
         });
 
         return res.status(201).json({ status: 201, success: true, message: "category Created SuccessFully...", data: existCategory })
@@ -98,7 +99,7 @@ exports.updateCategoryById = async (req, res) => {
         if (req.files.vectorImage) {
             req.body.vectorImage = req.files.vectorImage[0].path
         }
-        
+
         updateCategoryId = await category.findByIdAndUpdate(id, { ...req.body }, { new: true });
 
         return res.status(200).json({ status: 200, success: true, message: "Category Updated SuccessFully...", data: updateCategoryId })
@@ -122,6 +123,22 @@ exports.deleteCategoryById = async (req, res) => {
         await category.findByIdAndDelete(id)
 
         return res.status(200).json({ status: 200, success: true, message: "Category Delete SuccessFully..." });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, success: false, message: error.message })
+    }
+}
+
+exports.deleteAllCatrgory = async (req, res) => {
+    try {
+        let deleteAllCategory = await category.deleteMany({});
+
+        if (deleteAllCategory.deletedCount === 0) {
+            return res.status(404).json({ status: 404, status: false, message: "Category Not found" });
+        }
+
+        return res.status(200).json({ status: 200, success: true, message: "All Category Delete SuccessFully..." })
 
     } catch (error) {
         console.log(error)

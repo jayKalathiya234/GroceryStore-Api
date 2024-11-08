@@ -12,6 +12,11 @@ const categorySchema = monogose.Schema({
     vectorImage: {
         type: String,
         require: true
+    },
+    status: {
+        type: Boolean,
+        require: true,
+        default: true
     }
 }, {
     timestamps: true,

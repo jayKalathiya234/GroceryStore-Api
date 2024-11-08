@@ -115,3 +115,19 @@ exports.deleteRatingDataById = async (req, res) => {
         return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
+
+exports.deleteAllRatings = async (req, res) => {
+    try {
+        let deleteAllRating = await rating.deleteMany({});
+
+        if (deleteAllRating.deletedCount === 0) {
+            return res.status(404).json({ status: 404, status: false, message: "Rating Not found" });
+        }
+
+        return res.status(200).json({ status: 200, success: true, message: "All Rating Delete SuccessFully..." })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, success: false, message: error.message })
+    }
+}

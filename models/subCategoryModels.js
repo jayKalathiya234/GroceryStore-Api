@@ -13,6 +13,11 @@ const subCategorySchema = mongoose.Schema({
     subCategoryImage: {
         type: String,
         required: true
+    },
+    status: {
+        type: Boolean,
+        require: true,
+        default: true
     }
 }, {
     timestamps: true,

@@ -149,3 +149,19 @@ exports.deleteCoupenById = async (req, res) => {
         return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
+
+exports.deleteAllCoupens = async (req, res) => {
+    try {
+        let deleteAllCoupens = await coupen.deleteMany({});
+
+        if (deleteAllCoupens.deletedCount === 0) {
+            return res.status(404).json({ status: 404, status: false, message: "Coupen Not found" });
+        }
+
+        return res.status(200).json({ status: 200, success: true, message: "All Coupens Delete SuccessFully..." })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, success: false, message: error.message })
+    }
+}
