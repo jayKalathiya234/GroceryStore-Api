@@ -14,6 +14,7 @@ const { userLogin, adminLogin } = require('../auth/login');
 const { auth } = require('../helper/authToken');
 const { createSpecialDeals, getAllSpecialDeals, getSpecialDealById, updateSpecialDealById, deleteSpecialDealById } = require('../controller/specialDealsController');
 const { createMoreToExplore, getAllMoreToExplores, getMoreToExploreById, updateMoretoExploreById, deleteMoreToExploreById } = require('../controller/moreToExpolre.contoller');
+const { createProductAditional, getAllProductAditional, getProductAditionalById, updateProductAditionalById, deleteProductAdtionalById } = require('../controller/productAditional.Controller');
 
 const indexRoutes = express.Router();
 
@@ -134,6 +135,14 @@ indexRoutes.get('/getAllMoreToExplore', getAllMoreToExplores);
 indexRoutes.get('/getMoreToExplore/:id', getMoreToExploreById);
 indexRoutes.put('/updateMoreToExplore/:id', upload.single('moreToExploreImage'), updateMoretoExploreById);
 indexRoutes.delete('/deleteMoreToExplore/:id', deleteMoreToExploreById);
+
+// productAditional routes
+
+indexRoutes.post('/createProductAditional', upload.array('image'), createProductAditional);
+indexRoutes.get('/allProductAditional', getAllProductAditional);
+indexRoutes.get('/getProductAditional/:id', getProductAditionalById);
+indexRoutes.put('/updateProductAditional/:id', upload.array('image'), updateProductAditionalById);
+indexRoutes.delete('/deleteProductAditional/:id', deleteProductAdtionalById);
 
 // Login With Mobile No
 

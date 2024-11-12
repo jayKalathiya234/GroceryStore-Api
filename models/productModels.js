@@ -15,6 +15,10 @@ const productSchema = mongoose.Schema({
         ref: 'subCategory',
         required: true
     },
+    barcode: {
+        type: String,
+        require: true
+    },
     productImage: [{
         type: String,
         required: true
@@ -28,6 +32,10 @@ const productSchema = mongoose.Schema({
         require: true
     },
     discount: {
+        type: String,
+        require: true
+    },
+    unit: {
         type: String,
         require: true
     },
@@ -83,6 +91,19 @@ const productSchema = mongoose.Schema({
         type: Boolean,
         require: true,
         default: true
+    },
+    visibility: {
+        type: String,
+        enum: ["Published", 'Scheduled', 'Hidden'],
+        default: "Published"
+    },
+    scheduledDate: {
+        type: String,
+        require: true
+    },
+    scheduledTime: {
+        type: String,
+        require: true
     }
 }, {
     timestamps: true,

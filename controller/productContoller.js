@@ -2,7 +2,7 @@ const product = require('../models/productModels')
 
 exports.createProduct = async (req, res) => {
     try {
-        let { productName, categoryId, subCategoryId, quantity, totalPrice, price, productImage, weight, description, discount, productDetails, FSSAILicense, NutrientValueAndBenefits, StorageTemperature, disclaimer, customerCareDetails, returnPolicy, expiryDate, SellerFSSAI, status } = req.body;
+        let { productName, categoryId, subCategoryId, barcode, quantity, unit, totalPrice, price, productImage, weight, description, discount, productDetails, FSSAILicense, NutrientValueAndBenefits, StorageTemperature, disclaimer, customerCareDetails, returnPolicy, expiryDate, SellerFSSAI, status, visibility, scheduledDate, scheduledTime } = req.body;
 
         let existProduct = await product.findOne({ productName });
 
@@ -20,8 +20,10 @@ exports.createProduct = async (req, res) => {
             productName,
             categoryId,
             subCategoryId,
+            barcode,
             productImage: files.map(file => file.path),
             description,
+            unit,
             price,
             weight,
             discount,
@@ -36,7 +38,10 @@ exports.createProduct = async (req, res) => {
             returnPolicy,
             expiryDate,
             SellerFSSAI,
-            status
+            status,
+            visibility,
+            scheduledDate,
+            scheduledTime
         });
 
         return res.status(201).json({ status: 201, success: true, message: "Product Created Successfully...", data: existProduct });

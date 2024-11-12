@@ -7,7 +7,7 @@ exports.createProductAditional = async (req, res) => {
         let existAditionalDetails = await productAditional.findOne({ productId })
 
         if (existAditionalDetails) {
-            return res.status(409).json({ status: 409, message: "Product Aditional Data Alredy Exist" })
+            return res.status(409).json({ status: 409, success: false, message: "Product Aditional Data Alredy Exist" })
         }
 
         let data = JSON.parse(req.body.data || '[]');
@@ -24,10 +24,11 @@ exports.createProductAditional = async (req, res) => {
             data,
         });
 
-        return res.status(201).json({ status: 201, message: "Product Aditional Created SuccessFully...", productAditional: existAditionalDetails })
+        return res.status(201).json({ status: 201, success: true, message: "Product Aditional Created SuccessFully...", productAditional: existAditionalDetails })
+
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -37,7 +38,7 @@ exports.getAllProductAditional = async (req, res) => {
         let pageSize = parseInt(req.query.pageSize)
 
         if (page < 1 || pageSize < 1) {
-            return res.status(401).json({ status: 401, message: "Page And PageSize Cann't Be Less Than 1" })
+            return res.status(401).json({ status: 401, success: false, message: "Page And PageSize Cann't Be Less Than 1" })
         }
 
         let paginatedProductAditional;
@@ -47,7 +48,7 @@ exports.getAllProductAditional = async (req, res) => {
         let count = paginatedProductAditional.length
 
         if (count === 0) {
-            return res.status(404).json({ status: 404, message: "ProductAditional Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "ProductAditional Not Found" })
         }
 
         if (page && pageSize) {
@@ -56,11 +57,11 @@ exports.getAllProductAditional = async (req, res) => {
             paginatedProductAditional = await paginatedProductAditional.slice(startIndex, lastIndex)
         }
 
-        return res.status(200).json({ status: 200, totalAditionalProducts: count, message: "All ProductAditional Found SuccessFully...", productAditional: paginatedProductAditional })
+        return res.status(200).json({ status: 200, success: true, totalAditionalProducts: count, message: "All ProductAditional Found SuccessFully...", productAditional: paginatedProductAditional })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -71,14 +72,14 @@ exports.getProductAditionalById = async (req, res) => {
         let getProductAditionalId = await productAditional.findById(id)
 
         if (!getProductAditionalId) {
-            return res.status(404).json({ status: 404, message: "Product Aditional Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Product Aditional Not Found" })
         }
 
-        return res.status(200).json({ status: 200, message: "Product Aditional Found SuccessFully...", productAditional: getProductAditionalId });
+        return res.status(200).json({ status: 200, success: true, message: "Product Aditional Found SuccessFully...", productAditional: getProductAditionalId });
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -89,7 +90,7 @@ exports.updateProductAditionalById = async (req, res) => {
         let updateProductAditionalId = await productAditional.findById(id)
 
         if (!updateProductAditionalId) {
-            return res.status(404).json({ status: 404, message: "Product Aditional Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Product Aditional Not Found" })
         }
         let data = JSON.parse(req.body.data || "[]");
 
@@ -105,11 +106,11 @@ exports.updateProductAditionalById = async (req, res) => {
 
         await updateProductAditionalId.save()
 
-        return res.status(200).json({ status: 200, message: "Product Aditional Found SuccessFully...", productAditional: updateProductAditionalId })
+        return res.status(200).json({ status: 200, success: true, message: "Product Aditional Found SuccessFully...", productAditional: updateProductAditionalId })
 
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
@@ -120,14 +121,14 @@ exports.deleteProductAdtionalById = async (req, res) => {
         let deleteProductAdtionalId = await productAditional.findById(id)
 
         if (!deleteProductAdtionalId) {
-            return res.status(404).json({ status: 404, message: "Product Aditional Not Found" })
+            return res.status(404).json({ status: 404, success: false, message: "Product Aditional Not Found" })
         }
 
         await productAditional.findByIdAndDelete(id)
 
-        return res.status(200).json({ status: 200, message: "Product Aditional Delete SuccessFully..." })
+        return res.status(200).json({ status: 200, success: true, message: "Product Aditional Delete SuccessFully..." })
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ status: 500, message: error.message })
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
