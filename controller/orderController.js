@@ -99,7 +99,7 @@ exports.createOrder = async (req, res) => {
             paymentMethod,
             coupenId,
             discount: discountAmount,
-            status: "pending",
+            status: "Confirmed",
             subTotal: totalAmount + discountAmount,
             totalAmount
         });
@@ -270,13 +270,23 @@ exports.changeOrderStatusById = async (req, res) => {
     try {
         let id = req.params.id
 
-        let changeOrderStatusId = await order.findById(id)
+        let { status } = req.body
+        
+        let changeOrderStatusId = await order.findOne({ "orderItems._id": id })
 
         if (!changeOrderStatusId) {
             return res.status(404).json({ status: 404, success: false, message: "Order Not Found" })
         }
 
-        changeOrderStatusId = await order.findByIdAndUpdate(id, { ...req.body }, { new: true });
+        let orderItem = changeOrderStatusId.orderItems.find(item => item._id.toString() === id);
+
+        if (!orderItem) {
+            return res.status(404).json({ status: 404, success: false, message: "Order Item Not Found" });
+        }
+
+        orderItem.status = status;
+
+        await orderItem.save();
 
         return res.status(200).json({ status: 200, success: true, message: "Order Status Updated SuccessFully...", data: changeOrderStatusId })
 
@@ -292,18 +302,23 @@ exports.cancelOrder = async (req, res) => {
 
         let { reason } = req.body;
 
-        let checkOrder = await order.findById(id)
+        let checkOrder = await order.findOne({ "orderItems._id": id })
 
         if (!checkOrder) {
             return res.status(404).json({ status: 404, success: false, message: "Order Not Found" })
         }
 
-        checkOrder.status = "canceled"
+        let orderItem = checkOrder.orderItems.find(item => item._id.toString() === id);
 
-        checkOrder.reason = reason
+        if (!orderItem) {
+            return res.status(404).json({ status: 404, success: false, message: "Order Item Not Found" });
+        }
 
-        checkOrder.save();
+        orderItem.status = "Cancelled";
 
+        orderItem.reason = reason;
+
+        await checkOrder.save();
         return res.status(200).json({ status: 200, success: true, message: "Order Canceled SuccessFully...", data: checkOrder })
 
     } catch (error) {

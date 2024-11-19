@@ -2,7 +2,7 @@ const coupen = require('../models/couponModels')
 
 exports.createCoupen = async (req, res) => {
     try {
-        let { coupenName, coupenCode, coupenDiscount, description, coupenImage, type } = req.body
+        let { coupenName, coupenCode, coupenDiscount, description, coupenImage, type, startDate, expiryDate } = req.body
 
         let existCoupen = await coupen.findOne({ coupenName })
 
@@ -19,6 +19,8 @@ exports.createCoupen = async (req, res) => {
             coupenCode,
             coupenDiscount,
             description,
+            startDate,
+            expiryDate,
             coupenImage: req.file.path,
             type
         });

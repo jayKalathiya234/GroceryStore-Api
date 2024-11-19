@@ -21,6 +21,15 @@ const orderSchema = mongoose.Schema({
                 type: Number,
                 required: true
             },
+            status: {
+                type: String,
+                enum: ['Confirmed', 'shipped', 'delivered', 'Cancelled'],
+                default: 'Confirmed',
+            },
+            reason: {
+                type: String,
+                require: true
+            }
         }
     ],
     address: {
@@ -41,11 +50,6 @@ const orderSchema = mongoose.Schema({
         type: Number,
         require: true
     },
-    status: {
-        type: String,
-        enum: ['pending', 'shipped', 'delivered', 'canceled'],
-        default: 'pending',
-    },
     discount: {
         type: Number,
         default: 0
@@ -54,10 +58,6 @@ const orderSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
-    reason: {
-        type: String,
-        require: true
-    }
 }, {
     timestamps: true,
     versionKey: false
