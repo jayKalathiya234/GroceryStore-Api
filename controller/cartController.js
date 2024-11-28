@@ -73,6 +73,7 @@ exports.getAllMyCarts = async (req, res) => {
         }
 
         return res.status(200).json({ status: 200, success: true, message: "All My Carts Found SuccessFully...", data: getMyCarts })
+    
     } catch (error) {
         console.log(error)
         return res.status(500).json({ status: 500, success: false, message: error.message })

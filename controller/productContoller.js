@@ -104,31 +104,6 @@ exports.getProductById = async (req, res) => {
 }
 
 exports.updateProductById = async (req, res) => {
-    // try {
-    //     let id = req.params.id
-
-    //     let updateProductId = await product.findById(id)
-
-    //     if (!updateProductId) {
-    //         return res.status(404).json({ status: 404, success: false, message: "Product Not Found" })
-    //     }
-
-    //     if (req.files) {
-    //         req.body.productImage = req.files['productImage'].map(file => file.path);
-    //     }
-
-    //     if (req.body.totalPrice && req.body.discount) {
-    //         req.body.price = req.body.totalPrice - req.body.discount;
-    //     }
-
-    //     updateProductId = await product.findByIdAndUpdate(id, { ...req.body }, { new: true });
-
-    //     return res.status(200).json({ status: 200, success: true, message: "Product Updated SuccessFully...", data: updateProductId })
-
-    // } catch (error) {
-    //     console.log(error)
-    //     return res.status(500).json({ status: 500, success: false, message: error.message })
-    // }
     try {
         let id = req.params.id
 
@@ -146,13 +121,12 @@ exports.updateProductById = async (req, res) => {
             productImages.push(...newImagePaths);
         }
 
-        // Handle existing images
         if (req.body.existingImages) {
             try {
                 const existingImages = JSON.parse(req.body.existingImages);
                 productImages.push(...existingImages);
-            } catch (parseError) {
-                console.error('Error parsing existing images', parseError);
+            } catch (error) {
+                console.error(error);
             }
         }
 
@@ -165,44 +139,18 @@ exports.updateProductById = async (req, res) => {
             req.body.price = req.body.totalPrice - req.body.discount;
         }
 
-        // Remove existingImages from body before updating
         delete req.body.existingImages;
 
 
         updateProductId = await product.findByIdAndUpdate(id, { ...req.body }, { new: true });
 
-        return res.status(200).json({
-            status: 200,
-            success: true,
-            message: "Product Updated Successfully...",
-            data: updateProductId
-        })
+        return res.status(200).json({ status: 200, success: true, message: "Product Updated Successfully...", data: updateProductId })
 
     } catch (error) {
         console.log(error)
         return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
-
-// exports.deleteProductById = async (req, res) => {
-//     try {
-//         let id = req.params.id
-
-//         let deleteProductId = await product.findById(id)
-
-//         if (!deleteProductId) {
-//             return res.status(404).json({ status: 404, success: false, message: "Product Not Found" });
-//         }
-
-//         await product.findByIdAndDelete(id)
-
-//         return res.status(200).json({ status: 200, success: true, message: "Product Delete SuccessFully..." });
-
-//     } catch (error) {
-//         console.log(error);
-//         return res.status(500).json({ status: 500, success: false, message: error.message })
-//     }
-// }
 
 exports.deleteProductById = async (req, res) => {
     try {
@@ -246,26 +194,12 @@ exports.getProductByCategory = async (req, res) => {
     }
 }
 
-// exports.deleteAllProducts = async (req, res) => {
-//     try {
-//         let deleteAllProduct = await product.deleteMany({});
-
-//         if (deleteAllProduct.deletedCount === 0) {
-//             return res.status(404).json({ status: 404, success: false, message: "Product Not found" });
-//         }
-
-//         return res.status(200).json({ status: 200, success: true, message: "All Product Delete SuccessFully..." })
-
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json({ status: 500, success: false, message: error.message })
-//     }
-// }
-
 exports.deleteAllProducts = async (req, res) => {
     try {
         let deleteAllProduct = await product.deleteMany({});
+
         await productAditionalModels.deleteMany({});
+        
         return res.status(200).json({ status: 200, success: true, message: "All Product Delete SuccessFully..." })
 
     } catch (error) {

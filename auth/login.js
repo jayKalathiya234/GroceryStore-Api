@@ -17,7 +17,8 @@ exports.userLogin = async (req, res) => {
                 uid,
                 username,
                 image: imageUrl,
-                email
+                email,
+                role: 'user'
             })
         }
 

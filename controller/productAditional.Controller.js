@@ -127,6 +127,7 @@ exports.deleteProductAdtionalById = async (req, res) => {
         await productAditional.findByIdAndDelete(id)
 
         return res.status(200).json({ status: 200, success: true, message: "Product Aditional Delete SuccessFully..." })
+        
     } catch (error) {
         console.log(error)
         return res.status(500).json({ status: 500, success: false, message: error.message })

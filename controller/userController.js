@@ -7,6 +7,14 @@ const Product = require('../models/productModels');
 const specialDeals = require('../models/specialDealsModels');
 const jwt = require('jsonwebtoken')
 const moreToExplore = require('../models/moreToExplore.models');
+const twilio = require('twilio')
+
+const accountSid = process.env.TWILIOACCOUNTSID
+const authToken = process.env.TWILIOAUTHTOKEN
+const twilioPhoneNumber = process.env.TWILIOPHONENUMBER
+
+const client = twilio(accountSid, authToken);
+
 
 exports.createAdminUser = async (req, res) => {
     try {
@@ -246,6 +254,7 @@ exports.dashBoard = async (req, res) => {
         };
 
         return res.status(200).json({ status: 200, success: true, status: true, message: "DashBoard Data Found SuccessFully....", data: categorizedData });
+        
     } catch (error) {
         console.log(error)
         return res.status(500).json({ status: 500, success: false, message: error.message })
@@ -267,6 +276,7 @@ exports.loginWithMobileNo = async (req, res) => {
         if (!userMobileNo) {
             userMobileNo = await user.create({
                 mobileNo,
+                role: 'user'
             });
         }
 
@@ -332,14 +342,6 @@ exports.staticResentOtp = async (req, res) => {
     }
 }
 
-const twilio = require('twilio')
-
-const accountSid = process.env.TWILIOACCOUNTSID
-const authToken = process.env.TWILIOAUTHTOKEN
-const twilioPhoneNumber = process.env.TWILIOPHONENUMBER
-
-const client = twilio(accountSid, authToken);
-
 exports.generateOtp = async (req, res) => {
     try {
         let { mobileNo } = req.body
@@ -355,16 +357,12 @@ exports.generateOtp = async (req, res) => {
                 mobileNo
             });
         }
+
         let otp = Math.floor(1000 + Math.random() * 9000)
 
         checkMobileNo.otp = otp
 
-        console.log(otp);
-
         checkMobileNo.save();
-
-        console.log(mobileNo);
-
 
         await client.messages.create({
             body: `Your OTP is: ${otp}`,
@@ -372,7 +370,8 @@ exports.generateOtp = async (req, res) => {
             to: mobileNo
         });
 
-        return res.status(200).json({ status: 200, message: "Otp Sent SuccessFully...", otp: checkMobileNo })
+        return res.status(200).json({ status: 200, message: "Otp Sent SuccessFully..." })
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({ status: 500, message: error.message })
@@ -398,12 +397,12 @@ exports.verifyGenerateOtp = async (req, res) => {
         checkMobileNoIsExist.otp = undefined;
 
         checkMobileNoIsExist.save();
-        return res.status(200).json({ status: 200, message: "Otp Verify SuccessFully...", user: checkMobileNoIsExist, token: token })
 
+        return res.status(200).json({ status: 200, message: "Otp Verify SuccessFully...", user: checkMobileNoIsExist, token: token })
 
     } catch (error) {
         console.log(error)
-        return res.status(500)
+        return res.status(500).json({ status: 500, message: error.message })
     }
 }
 
@@ -416,7 +415,7 @@ exports.resentOtp = async (req, res) => {
         }
 
         let checkMobileNo = await user.findOne({ mobileNo })
-        console.log(checkMobileNo);
+
         if (!checkMobileNo) {
             return res.status(404).json({ status: 404, message: "Mobile No Not Found" })
         }
@@ -458,3 +457,26 @@ exports.deleteAllUsers = async (req, res) => {
         return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
+
+exports.globalSearch = async (req, res) => {
+    const { query } = req.query;
+    try {
+        const results = await Promise.all([Product.find({ $or: [{ productName: { $regex: query, $options: 'i' } },] }).select('productName'),
+        Category.find({ categoryName: { $regex: query, $options: 'i' } }).select('categoryName'),
+        SubCategory.find({ subCategoryName: { $regex: query, $options: 'i' } }).select('subCategoryName'),
+        user.find({ $or: [{ name: { $regex: query, $options: 'i' } }, { email: { $regex: query, $options: 'i' } }] }).select('name')]);
+
+        const filteredResults = {
+            products: results[0].length ? results[0] : [],
+            categories: results[1].length ? results[1] : [],
+            subCategories: results[2].length ? results[2] : [],
+            users: results[3].length ? results[3] : [],
+        };
+
+        return res.status(200).json({ status: 200, filteredResults });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ status: 500, message: error.message });
+    }
+};
