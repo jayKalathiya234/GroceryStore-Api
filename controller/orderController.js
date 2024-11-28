@@ -130,7 +130,7 @@ exports.getAllOrders = async (req, res) => {
 
         let paginatedOrdersData;
 
-        paginatedOrdersData = await order.find()
+        paginatedOrdersData = await order.find().populate('userId').populate('orderItems.productId').populate('address')
 
         let count = paginatedOrdersData.length
 
@@ -156,7 +156,7 @@ exports.getOrderById = async (req, res) => {
     try {
         let id = req.params.id
 
-        let getOrderId = await order.findById(id)
+        let getOrderId = await order.findById(id).populate('userId').populate('orderItems.productId').populate('address')
 
         if (!getOrderId) {
             return res.status(404).json({ status: 404, success: false, message: "Order Not Found" })
@@ -271,7 +271,7 @@ exports.changeOrderStatusById = async (req, res) => {
         let id = req.params.id
 
         let { status } = req.body
-        
+
         let changeOrderStatusId = await order.findOne({ "orderItems._id": id })
 
         if (!changeOrderStatusId) {
@@ -286,7 +286,7 @@ exports.changeOrderStatusById = async (req, res) => {
 
         orderItem.status = status;
 
-        await orderItem.save();
+        await changeOrderStatusId.save();
 
         return res.status(200).json({ status: 200, success: true, message: "Order Status Updated SuccessFully...", data: changeOrderStatusId })
 

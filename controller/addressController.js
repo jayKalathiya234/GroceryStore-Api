@@ -2,17 +2,28 @@ const address = require('../models/addressModels')
 
 exports.createAddress = async (req, res) => {
     try {
-        let { userId, houseNo, floor, area, localitiy, yourName, yourPhoneNumber, saveAddressAs, orderFor } = req.body
+        let { userId, houseNo, pincode, floor, area, locality, yourName, yourPhoneNumber, saveAddressAs, orderFor } = req.body
 
-        addressData = `${houseNo},${floor},${area},${localitiy}`
+        let addressData;
+
+        if (floor && floor !== 'undefined') {
+            addressData = `${houseNo},${floor},${area},${locality}`;
+        } else {
+            addressData = `${houseNo},${area},${locality}`;
+        }
+
 
         createAddress = await address.create({
             userId,
             address: addressData,
             yourName,
+            floor,
+            area,
+            locality,
             yourPhoneNumber,
             saveAddressAs,
-            orderFor
+            orderFor,
+            pincode
         });
 
         return res.status(201).json({ status: 201, success: true, message: 'Delivery Address Created SuccessFully...', data: createAddress })
@@ -75,22 +86,130 @@ exports.getAddressById = async (req, res) => {
 }
 
 exports.updateAddressById = async (req, res) => {
+    // try {
+    //     let id = req.params.id
+
+    //     let updateAddressId = await address.findById(id)
+
+    //     if (!updateAddressId) {
+    //         return res.status(404).json({ status: 404, success: false, message: "Address Not Found" })
+    //     }
+
+    //     updateAddressId = await address.findByIdAndUpdate(id, { ...req.body }, { new: true });
+
+    //     return res.status(200).json({ status: 200, success: true, message: 'Address Updated SuccessFully....', data: updateAddressId })
+
+    // } catch (error) {
+    //     console.log(error)
+    //     return res.status(500).json({ status: 500, success: false, message: error.message })
+    // }
+    // try {
+    //     const { id } = req.params;
+    //     const { houseNo, floor, area, locality } = req.body;
+
+    //     // Find the existing address
+    //     const existingAddress = await address.findById(id);
+
+    //     if (!existingAddress) {
+    //         return res.status(404).json({
+    //             status: 404,
+    //             success: false,
+    //             message: "Address Not Found"
+    //         });
+    //     }
+
+    //     // Extract existing address details
+    //     const existingAddressParts = existingAddress.address.split(',');
+
+    //     // Construct updated address data
+    //     let updatedAddressData;
+    //     if (existingAddressParts.length === 4) {
+    //         // If existing address has 4 parts (houseNo, floor, area, locality)
+    //         updatedAddressData = `${houseNo || existingAddressParts[0]},${existingAddressParts[1]},${area || existingAddressParts[2]},${locality || existingAddressParts[3]}`;
+    //     } else {
+    //         // If existing address has 3 parts (houseNo, area, locality)
+    //         updatedAddressData = `${houseNo || existingAddressParts[0]},${area || existingAddressParts[2]},${locality || existingAddressParts[3]}`;
+    //     }
+
+    //     // Prepare update object
+    //     const updateData = {
+    //         address: updatedAddressData
+    //     };
+
+    //     // Perform the update
+    //     const updatedAddress = await address.findByIdAndUpdate(
+    //         id,
+    //         updateData,
+    //         {
+    //             new: true,  // Return the updated document
+    //             runValidators: true  // Run model validations
+    //         }
+    //     );
+
+    //     return res.status(200).json({
+    //         status: 200,
+    //         success: true,
+    //         message: 'Address Updated Successfully',
+    //         data: updatedAddress
+    //     });
+
+    // } catch (error) {
+    //     console.error('Update Address Error:', error);
+    //     return res.status(500).json({
+    //         status: 500,
+    //         success: false,
+    //         message: error.message
+    //     });
+    // }
     try {
-        let id = req.params.id
+        const id = req.params.id;
+        const {
+            houseNo,
+            floor,
+            area,
+            locality,
+            saveAddressAs
+        } = req.body;
 
-        let updateAddressId = await address.findById(id)
+        const existingAddress = await address.findById(id);
 
-        if (!updateAddressId) {
-            return res.status(404).json({ status: 404, success: false, message: "Address Not Found" })
+        if (!existingAddress) {
+            return res.status(404).json({ status: 404, success: false, message: "Address Not Found" });
+        }
+        const existingAddressParts = existingAddress.address.split(',');
+
+        let updatedAddressData;
+        if (existingAddressParts.length === 4) {
+            if (floor && floor !== 'undefined') {
+                updatedAddressData = `${houseNo || existingAddressParts[0]},${floor},${area || existingAddressParts[2]},${locality || existingAddressParts[3]}`;
+            } else {
+                updatedAddressData = `${houseNo || existingAddressParts[0]},${area || existingAddressParts[2]},${locality || existingAddressParts[3]}`;
+            }
+        } else {
+            if (floor && floor !== 'undefined') {
+                updatedAddressData = `${houseNo || existingAddressParts[0]},${floor},${area || existingAddressParts[1]},${locality || existingAddressParts[2]}`;
+            } else {
+                updatedAddressData = `${houseNo || existingAddressParts[0]},${area || existingAddressParts[1]},${locality || existingAddressParts[2]}`;
+            }
         }
 
-        updateAddressId = await address.findByIdAndUpdate(id, { ...req.body }, { new: true });
+        const updateData = {
+            houseNo,
+            floor,
+            area,
+            locality,
+            saveAddressAs,
+            address: updatedAddressData,
+            saveAddressAs,
+        };
 
-        return res.status(200).json({ status: 200, success: true, message: 'Address Updated SuccessFully....', data: updateAddressId })
+        const updatedAddress = await address.findByIdAndUpdate(id, updateData, { new: true, });
+
+        return res.status(200).json({ status: 200, success: true, message: 'Address Updated Successfully', data: updatedAddress });
 
     } catch (error) {
-        console.log(error)
-        return res.status(500).json({ status: 500, success: false, message: error.message })
+        console.error(error);
+        return res.status(500).json({ status: 500, success: false, message: error.message });
     }
 }
 

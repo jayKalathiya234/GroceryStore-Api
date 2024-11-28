@@ -58,6 +58,11 @@ const orderSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    orderStatus: {
+        type: String,
+        enum: ['Pending', 'Completed', 'Cancelled'],
+        default: 'Pending',
+    },
 }, {
     timestamps: true,
     versionKey: false

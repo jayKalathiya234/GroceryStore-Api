@@ -10,6 +10,26 @@ const addressSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    houseNo: {
+        type: String,
+        require: true
+    },
+    floor: {
+        type: String,
+        require: true
+    },
+    area: {
+        type: String,
+        require: true
+    },
+    pincode: {
+        type: String,
+        require: true
+    },
+    locality: {
+        type: String,
+        require: true
+    },
     yourName: {
         type: String,
         require: true
@@ -20,7 +40,7 @@ const addressSchema = mongoose.Schema({
     },
     saveAddressAs: {
         type: String,
-        enum: ['Home', "Work", "Hotel", "other"],
+        enum: ['Home', "Work", "Hotel", "Other"],
         require: true
     },
     orderFor: {

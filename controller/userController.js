@@ -10,7 +10,7 @@ const moreToExplore = require('../models/moreToExplore.models');
 
 exports.createAdminUser = async (req, res) => {
     try {
-        let { name, email, password, mobileNo, address, image } = req.body
+        let { name, email, password, mobileNo, address, image, gender } = req.body
 
         let existName = await user.findOne({ name })
 
@@ -32,7 +32,8 @@ exports.createAdminUser = async (req, res) => {
             mobileNo,
             address,
             image: req.file.path,
-            role: "admin"
+            role: "admin",
+            gender
         });
 
         return res.status(201).json({ status: 201, success: true, message: "Admin User Created SuccessFully...", data: existName })
@@ -45,7 +46,7 @@ exports.createAdminUser = async (req, res) => {
 
 exports.createUser = async (req, res) => {
     try {
-        let { name, email, password, mobileNo, address, image } = req.body
+        let { name, email, password, mobileNo, address, image, gender } = req.body
 
         let existUserName = await user.findOne({ name })
 
@@ -67,7 +68,8 @@ exports.createUser = async (req, res) => {
             mobileNo,
             address,
             image: req.file.path,
-            role: "user"
+            role: "user",
+            gender
         })
 
         return res.status(201).json({ status: 201, success: true, message: "User Create SuccessFully...", data: existUserName })
@@ -217,7 +219,7 @@ exports.dashBoard = async (req, res) => {
                 productName: product.productName,
                 totalQuantity: salesData.totalQuantity,
                 sales: product.sales,
-                productImage:product.productImage
+                productImage: product.productImage
             };
         });
 

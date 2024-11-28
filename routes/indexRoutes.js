@@ -10,7 +10,7 @@ const { createCartData, getAllCartData, getCartDataById, updateCartDataById, upd
 const { createRating, getAllRatings, getRatingDataById, updateRatingDataById, deleteRatingDataById, deleteAllRatings } = require('../controller/ratingController');
 const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, updateCoupenStatusById, deleteCoupenById, deleteAllCoupens } = require('../controller/coupenContoller');
 const { createOrder, getAllOrders, getOrderById, updateOrderById, deleteOrderById, getMyOrders, changeOrderStatusById, cancelOrder, deleteAllOrders } = require('../controller/orderController');
-const { userLogin, adminLogin } = require('../auth/login');
+const { userLogin, adminLogin, adminDashboard, changePassword } = require('../auth/login');
 const { auth } = require('../helper/authToken');
 const { createSpecialDeals, getAllSpecialDeals, getSpecialDealById, updateSpecialDealById, deleteSpecialDealById } = require('../controller/specialDealsController');
 const { createMoreToExplore, getAllMoreToExplores, getMoreToExploreById, updateMoretoExploreById, deleteMoreToExploreById } = require('../controller/moreToExpolre.contoller');
@@ -33,6 +33,8 @@ indexRoutes.put('/updateUser/:id', upload.single('image'), updateUserById)
 indexRoutes.delete('/deleteUser/:id', deleteUserById);
 indexRoutes.get('/dashBoard', dashBoard);
 indexRoutes.delete('/deleteAllUsers', deleteAllUsers)
+indexRoutes.get('/adminDashboard', adminDashboard);
+indexRoutes.put('/changePassword/:id', changePassword);
 
 // category routes 
 

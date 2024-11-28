@@ -36,7 +36,7 @@ exports.getAllRatings = async (req, res) => {
 
         let paginatedRating;
 
-        paginatedRating = await rating.find()
+        paginatedRating = await rating.find().populate('productId');
 
         let count = paginatedRating.length
 

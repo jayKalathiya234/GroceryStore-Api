@@ -40,7 +40,9 @@ const userSchema = mongoose.Schema({
         type: String,
         require: true
     },
-
+    gender: {
+        type: String,
+    },
     image: {
         type: String,
         require: true
