@@ -93,6 +93,31 @@ exports.changePassword = async (req, res) => {
     }
 }
 
+exports.resetPassword = async (req, res) => {
+    try {
+        let id = req.params.id
+
+        let getUserIdData = await user.findById(id)
+
+        let { newPassword, confirmPassword } = req.body
+
+        if (newPassword != confirmPassword) {
+            return res.status(400).json({ status: 400, message: "newPassword and confirmPassword Not Match" })
+        }
+
+        let salt = await bcrypt.genSalt(10);
+        let hasPassword = await bcrypt.hash(newPassword, salt)
+
+        getUserIdData = await user.findByIdAndUpdate(id, { password: hasPassword }, { new: true });
+
+        return res.status(200).json({ status: 200, message: "Password Reset SuccessFully..." });
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, message: error.message })
+    }
+}
+
 exports.adminDashboard = async (req, res) => {
     try {
         const totalRevenueResult = await Order.aggregate([

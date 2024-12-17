@@ -16,6 +16,8 @@ exports.createCategory = async (req, res) => {
             return res.status(400).json({ status: 400, success: false, message: "Both categoryImage and vectorImage are required" });
         }
 
+        categoryName = categoryName.trim().toLowerCase()
+
         existCategory = await category.create({
             categoryName,
             categoryImage: req.files['categoryImage'][0].path,

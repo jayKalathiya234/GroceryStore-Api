@@ -36,7 +36,7 @@ exports.getAllSpecialDeals = async (req, res) => {
 
         let paginatedSpecialDeals;
 
-        paginatedSpecialDeals = await specialDeals.find()
+        paginatedSpecialDeals = await specialDeals.find().populate('productId');
 
         let count = paginatedSpecialDeals.length
 
@@ -116,3 +116,14 @@ exports.deleteSpecialDealById = async (req, res) => {
     }
 }
 
+exports.deleteAllSpecialDeal = async (req, res) => {
+    try {
+        await specialDeals.deleteMany({});
+
+        return res.status(200).json({ status: 200, success: true, message: "All SpecialDeal Delete SuccessFully..." })
+
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({ status: 500, success: false, message: error.message })
+    }
+}

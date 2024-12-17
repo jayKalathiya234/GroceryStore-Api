@@ -10,9 +10,9 @@ const { createCartData, getAllCartData, getCartDataById, updateCartDataById, upd
 const { createRating, getAllRatings, getRatingDataById, updateRatingDataById, deleteRatingDataById, deleteAllRatings } = require('../controller/ratingController');
 const { createCoupen, getAllCoupens, getCoupenById, updateCoupenById, updateCoupenStatusById, deleteCoupenById, deleteAllCoupens } = require('../controller/coupenContoller');
 const { createOrder, getAllOrders, getOrderById, updateOrderById, deleteOrderById, getMyOrders, changeOrderStatusById, cancelOrder, deleteAllOrders } = require('../controller/orderController');
-const { userLogin, adminLogin, adminDashboard, changePassword } = require('../auth/login');
+const { userLogin, adminLogin, adminDashboard, changePassword, resetPassword } = require('../auth/login');
 const { auth } = require('../helper/authToken');
-const { createSpecialDeals, getAllSpecialDeals, getSpecialDealById, updateSpecialDealById, deleteSpecialDealById } = require('../controller/specialDealsController');
+const { createSpecialDeals, getAllSpecialDeals, getSpecialDealById, updateSpecialDealById, deleteSpecialDealById, deleteAllSpecialDeal } = require('../controller/specialDealsController');
 const { createMoreToExplore, getAllMoreToExplores, getMoreToExploreById, updateMoretoExploreById, deleteMoreToExploreById } = require('../controller/moreToExpolre.contoller');
 const { createProductAditional, getAllProductAditional, getProductAditionalById, updateProductAditionalById, deleteProductAdtionalById } = require('../controller/productAditional.Controller');
 
@@ -31,16 +31,20 @@ indexRoutes.get('/allUsers', auth(["admin"]), getAllUsers)
 indexRoutes.get('/getUser/:id', auth(['admin', 'user']), getUserById);
 indexRoutes.put('/updateUser/:id', auth(['admin', 'user']), upload.single('image'), updateUserById)
 indexRoutes.delete('/deleteUser/:id', auth(['admin', 'user']), deleteUserById);
-indexRoutes.get('/dashBoard', auth(['admin', 'user']), dashBoard);
+indexRoutes.get('/dashBoard', dashBoard);
 indexRoutes.delete('/deleteAllUsers', auth(['admin']), deleteAllUsers)
 indexRoutes.get('/adminDashboard', auth(['admin']), adminDashboard);
 indexRoutes.put('/changePassword/:id', auth(['admin']), changePassword);
+indexRoutes.put('/resetPassword/:id', resetPassword);
 indexRoutes.get('/globalSearch', globalSearch);
+
 // category routes 
 
 indexRoutes.post('/createCategory', auth(['admin']), upload.fields([{ name: 'categoryImage' }, { name: 'vectorImage' }]), createCategory);
 indexRoutes.get('/AllCategory', auth(['admin', 'user']), getAllCategories);
+indexRoutes.get('/getUserCategory', getAllCategories);
 indexRoutes.get('/getCategory/:id', auth(['admin', 'user']), getCategoryById);
+indexRoutes.get('/userGetCategory/:id', getCategoryById);
 indexRoutes.put('/updateCategory/:id', auth(['admin']), upload.fields([{ name: 'categoryImage' }, { name: 'vectorImage' }]), updateCategoryById);
 indexRoutes.delete('/deleteCategory/:id', auth(['admin']), deleteCategoryById);
 indexRoutes.delete('/deleteAllCategory', auth(['admin']), deleteAllCatrgory);
@@ -49,7 +53,9 @@ indexRoutes.delete('/deleteAllCategory', auth(['admin']), deleteAllCatrgory);
 
 indexRoutes.post('/createSubCategory', auth(['admin']), upload.single('subCategoryImage'), createSubCategory);
 indexRoutes.get('/AllSubCategory', auth(['admin', 'user']), getAllSubCategory);
+indexRoutes.get('/getUserSubCategory', getAllSubCategory);
 indexRoutes.get('/getSubCategory/:id', auth(['admin', 'user']), getSubCategoryById)
+indexRoutes.get('/userGetSubCategory/:id', getSubCategoryById)
 indexRoutes.put('/updateSubCategory/:id', auth(['admin']), upload.single('subCategoryImage'), updateSubCategoryById);
 indexRoutes.delete('/deleteSubCategory/:id', auth(['admin']), deleteSubCategoryById)
 indexRoutes.delete('/deleteAllSubCategory', auth(['admin']), deleteAllSubCatrgory);
@@ -58,7 +64,9 @@ indexRoutes.delete('/deleteAllSubCategory', auth(['admin']), deleteAllSubCatrgor
 
 indexRoutes.post('/createProducts', auth(['admin']), upload.fields([{ name: 'productImage' }]), createProduct);
 indexRoutes.get('/allProduct', auth(['admin', 'user']), getAllProduct);
+indexRoutes.get('/getUserProduct', getAllProduct);
 indexRoutes.get('/getProduct/:id', auth(['admin', 'user']), getProductById);
+indexRoutes.get('/userGetProduct/:id', getProductById);
 indexRoutes.put('/updateProduct/:id', auth(['admin']), upload.fields([{ name: 'productImage' }]), updateProductById);
 indexRoutes.delete('/deleteProduct/:id', auth(['admin']), deleteProductById);
 indexRoutes.get('/getProductByCategory/:id', auth(['admin', 'user']), getProductByCategory)
@@ -112,7 +120,7 @@ indexRoutes.delete('/deleteAllCoupens', auth(['admin']), deleteAllCoupens)
 
 // Order Routes 
 
-indexRoutes.post('/createOrder', auth(['admin']), createOrder)
+indexRoutes.post('/createOrder', auth(['admin', 'user']), createOrder)
 indexRoutes.get('/allOrders', auth(['admin', 'user']), getAllOrders)
 indexRoutes.get('/getOrder/:id', auth(['admin', 'user']), getOrderById)
 indexRoutes.put('/updateOrder/:id', auth(['admin', 'user']), updateOrderById);
@@ -129,6 +137,7 @@ indexRoutes.get('/allSpecialDeal', auth(['admin', 'user']), getAllSpecialDeals);
 indexRoutes.get('/getSpecialDeal/:id', auth(['admin', 'user']), getSpecialDealById)
 indexRoutes.put('/updateSpecialDeal/:id', auth(['admin']), updateSpecialDealById);
 indexRoutes.delete('/deleteSpecialDeal/:id', auth(['admin']), deleteSpecialDealById);
+indexRoutes.delete('/deleteAllSpecialDeal', auth(['admin']), deleteAllSpecialDeal);
 
 // moreToExlpre Routes
 
@@ -148,13 +157,13 @@ indexRoutes.delete('/deleteProductAditional/:id', auth(['admin']), deleteProduct
 
 // Login With Mobile No
 
-indexRoutes.post('/mobileNoLogin', auth(['admin', 'user']), loginWithMobileNo);
-indexRoutes.post('/verifyOtp', auth(['admin', 'user']), verifyOtp);
-indexRoutes.post('/staticResendotp', auth(['admin', 'user']), staticResentOtp);
+indexRoutes.post('/mobileNoLogin', loginWithMobileNo);
+indexRoutes.post('/verifyOtp', verifyOtp);
+indexRoutes.post('/staticResendotp', staticResentOtp);
 
 
-indexRoutes.post('/generateOtp', auth(['admin', 'user']), generateOtp);
-indexRoutes.post('/verifyGenereOtp', auth(['admin', 'user']), verifyGenerateOtp);
-indexRoutes.post('/resentOtp', auth(['admin', 'user']), resentOtp);
+indexRoutes.post('/generateOtp', generateOtp);
+indexRoutes.post('/verifyGenereOtp', verifyGenerateOtp);
+indexRoutes.post('/resentOtp', resentOtp);
 
 module.exports = indexRoutes;   

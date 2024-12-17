@@ -1,5 +1,6 @@
 const order = require('../models/orderModels');
 const cart = require('../models/cartModels');
+const mongoose = require('mongoose')
 const product = require('../models/productModels');
 const coupen = require('../models/couponModels')
 const orderNoTracker = require('../models/orderSequanceValue.models')
@@ -252,7 +253,30 @@ exports.getMyOrders = async (req, res) => {
     try {
         let id = req.params.id
 
-        let checkUserId = await order.find({ userId: id })
+        let checkUserId = await order.aggregate([
+            {
+                $match: {
+                    userId: new mongoose.Types.ObjectId(id)
+                }
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'orderItems.productId',
+                    foreignField: '_id',
+                    as: 'productData'
+                }
+            },
+            {
+                $lookup: {
+                    from: "subcategories",
+                    localField: "productData.subCategoryId",
+                    foreignField: "_id",
+                    as: "subCategoryData"
+                }
+            }
+        ])
+
 
         if (!checkUserId) {
             return res.status(404).json({ status: 404, success: false, message: "Order Not Found" })
@@ -319,6 +343,7 @@ exports.cancelOrder = async (req, res) => {
         orderItem.reason = reason;
 
         await checkOrder.save();
+
         return res.status(200).json({ status: 200, success: true, message: "Order Canceled SuccessFully...", data: checkOrder })
 
     } catch (error) {

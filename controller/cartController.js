@@ -72,8 +72,10 @@ exports.getAllMyCarts = async (req, res) => {
             return res.status(404).json({ status: 404, success: false, message: "Carts Not Found" })
         }
 
-        return res.status(200).json({ status: 200, success: true, message: "All My Carts Found SuccessFully...", data: getMyCarts })
-    
+        let count = getMyCarts.length
+
+        return res.status(200).json({ status: 200, totalCarts: count, success: true, message: "All My Carts Found SuccessFully...", data: getMyCarts })
+
     } catch (error) {
         console.log(error)
         return res.status(500).json({ status: 500, success: false, message: error.message })

@@ -46,7 +46,12 @@ const userSchema = mongoose.Schema({
     image: {
         type: String,
         require: true
-    }
+    },
+    status: {
+        type: Boolean,
+        require: true,
+        default: true
+    },
 }, {
     timestamps: true,
     versionKey: false

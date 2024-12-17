@@ -104,6 +104,10 @@ const productSchema = mongoose.Schema({
     scheduledTime: {
         type: String,
         require: true
+    },
+    tax: {
+        type: Number,
+        require: true
     }
 }, {
     timestamps: true,

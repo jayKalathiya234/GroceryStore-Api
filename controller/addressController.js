@@ -23,7 +23,8 @@ exports.createAddress = async (req, res) => {
             yourPhoneNumber,
             saveAddressAs,
             orderFor,
-            pincode
+            pincode,
+            houseNo
         });
 
         return res.status(201).json({ status: 201, success: true, message: 'Delivery Address Created SuccessFully...', data: createAddress })
@@ -93,7 +94,9 @@ exports.updateAddressById = async (req, res) => {
             floor,
             area,
             locality,
-            saveAddressAs
+            saveAddressAs,
+            yourName,
+            yourPhoneNumber
         } = req.body;
 
         const existingAddress = await address.findById(id);
@@ -126,6 +129,8 @@ exports.updateAddressById = async (req, res) => {
             saveAddressAs,
             address: updatedAddressData,
             saveAddressAs,
+            yourName,
+            yourPhoneNumber
         };
 
         const updatedAddress = await address.findByIdAndUpdate(id, updateData, { new: true, });

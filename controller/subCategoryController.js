@@ -14,6 +14,8 @@ exports.createSubCategory = async (req, res) => {
             return res.status(401).json({ status: 401, success: false, message: "Sub Category Image is Required" })
         }
 
+        subCategoryName = subCategoryName.trim().toLowerCase()
+
         existSubCategory = await subCategory.create({
             categoryId,
             subCategoryName,
