@@ -163,6 +163,27 @@ exports.adminDashboard = async (req, res) => {
             }
         ]);
 
+        const orderItemStatusCounts = await Order.aggregate([
+            { $unwind: '$orderItems' },
+            {
+                $group: {
+                    _id: '$orderItems.status',
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const orderItemStats = {
+            Confirmed: 0,
+            shipped: 0,
+            delivered: 0,
+            Cancelled: 0
+        };
+
+        orderItemStatusCounts.forEach(status => {
+            orderItemStats[status._id] = status.count;
+        });
+
         const totalProducts = await Product.countDocuments({ status: true });
 
         const productList = await Product.aggregate([
@@ -188,10 +209,383 @@ exports.adminDashboard = async (req, res) => {
             },
         ]);
 
-        return res.status(200).json({ status: 200, totalRevenue: totalRevenueResult[0]?.totalRevenue || 0, dailyOrders: dailyOrders[0]?.totalDailyOrders || 0, dailySales: dailySales[0]?.totalDailySales || 0, totalProducts, productList: productList });
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1;
+
+        const yearlyData = await Order.aggregate([
+            {
+                $match: {
+                    orderStatus: 'Completed',
+                    createdAt: {
+                        $gte: new Date(`${currentYear}-01-01`),
+                        $lte: new Date(`${currentYear}-12-31`)
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    month: { $month: "$createdAt" },
+                    actualRevenue: { $subtract: ["$totalAmount", "$discount"] },
+                
+                    actualCost: { $multiply: ["$subTotal", 0.7] }
+                }
+            },
+            {
+                $group: {
+                    _id: { month: "$month" },
+                    totalRevenue: { $sum: "$actualRevenue" },
+                    totalCost: { $sum: "$actualCost" }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    month: "$_id.month",
+                    revenue: "$totalRevenue",
+                    cost: "$totalCost",
+                    monthName: {
+                        $arrayElemAt: [
+                            [
+                                'January', 'February', 'March', 'April',
+                                'May', 'June', 'July', 'August',
+                                'September', 'October', 'November', 'December'
+                            ],
+                            { $subtract: ["$_id.month", 1] }
+                        ]
+                    },
+                    profit: {
+                        $cond: {
+                            if: { $gt: [{ $subtract: ["$totalRevenue", "$totalCost"] }, 0] },
+                            then: { $subtract: ["$totalRevenue", "$totalCost"] },
+                            else: 0
+                        }
+                    },
+                    loss: {
+                        $cond: {
+                            if: { $lt: [{ $subtract: ["$totalRevenue", "$totalCost"] }, 0] },
+                            then: { $abs: { $subtract: ["$totalRevenue", "$totalCost"] } },
+                            else: 0
+                        }
+                    }
+                }
+            },
+            { $sort: { month: 1 } }
+        ]);
+
+        const completeYearData = Array.from({ length: 12 }, (_, index) => {
+            const month = index + 1;
+            const monthData = yearlyData.find(data => data.month === month) || {
+                month,
+                monthName: [
+                    'January', 'February', 'March', 'April',
+                    'May', 'June', 'July', 'August',
+                    'September', 'October', 'November', 'December'
+                ][index],
+                profit: 0,
+                loss: 0
+            };
+            return monthData;
+        });
+
+        const yearTotals = completeYearData.reduce((acc, curr) => ({
+            profit: acc.profit + curr.profit,
+            loss: acc.loss + curr.loss
+        }), { revenue: 0, cost: 0, profit: 0, loss: 0 });
+
+       
+
+        return res.status(200).json({
+            status: 200, totalRevenue: totalRevenueResult[0]?.totalRevenue || 0, dailyOrders: dailyOrders[0]?.totalDailyOrders || 0, dailySales: dailySales[0]?.totalDailySales || 0, orderItemStats, totalProducts, productList: productList,
+            totalRevenue: yearlyData.reduce((acc, data) => acc + data.revenue, 0),
+            yearlyData: {
+                currentYear,
+                monthlyData: completeYearData,
+                yearTotals
+            }
+
+        });
 
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: error.message });
     }
 }
+ // const yearlyData = await Order.aggregate([
+        //     {
+        //         $match: {
+        //             createdAt: {
+        //                 $gte: new Date(`${currentYear}-01-01`),
+        //                 $lte: new Date(`${currentYear}-12-31`)
+        //             }
+        //         }
+        //     },
+        //     {
+        //         $project: {
+        //             year: { $year: "$createdAt" },
+        //             month: { $month: "$createdAt" },
+        //             orderStatus: 1,
+        //             totalAmount: 1,
+        //             discount: 1,
+        //             estimatedCost: { $multiply: ["$totalAmount", 0.7] } // Assuming cost is 70% of totalAmount
+        //         }
+        //     },
+        //     {
+        //         $group: {
+        //             _id: {
+        //                 month: "$month"
+        //             },
+        //             revenue: {
+        //                 $sum: {
+        //                     $cond: [
+        //                         { $eq: ["$orderStatus", "Completed"] },
+        //                         { $subtract: ["$totalAmount", "$discount"] }, // Apply discount to revenue
+        //                         0
+        //                     ]
+        //                 }
+        //             },
+        //             totalOrders: { $sum: 1 },
+        //             completedOrders: {
+        //                 $sum: {
+        //                     $cond: [
+        //                         { $eq: ["$orderStatus", "Completed"] },
+        //                         1,
+        //                         0
+        //                     ]
+        //                 }
+        //             },
+        //             cancelledOrders: {
+        //                 $sum: {
+        //                     $cond: [
+        //                         { $eq: ["$orderStatus", "Cancelled"] },
+        //                         1,
+        //                         0
+        //                     ]
+        //                 }
+        //             },
+        //             costs: {
+        //                 $sum: {
+        //                     $cond: [
+        //                         { $eq: ["$orderStatus", "Completed"] },
+        //                         "$estimatedCost",
+        //                         0
+        //                     ]
+        //                 }
+        //             },
+        //             discounts: { $sum: "$discount" }
+        //         }
+        //     },
+        //     {
+        //         $project: {
+        //             _id: 0,
+        //             month: "$_id.month",
+        //             monthName: {
+        //                 $let: {
+        //                     vars: {
+        //                         monthsInYear: [
+        //                             'January', 'February', 'March', 'April',
+        //                             'May', 'June', 'July', 'August',
+        //                             'September', 'October', 'November', 'December'
+        //                         ]
+        //                     },
+        //                     in: {
+        //                         $arrayElemAt: ['$$monthsInYear', { $subtract: ['$_id.month', 1] }]
+        //                     }
+        //                 }
+        //             },
+        //             revenue: 1,
+        //             costs: 1,
+        //             discounts: 1,
+        //             totalOrders: 1,
+        //             completedOrders: 1,
+        //             cancelledOrders: 1,
+        //             profit: {
+        //                 // Profit calculation: Only if revenue is greater than cost
+        //                 $cond: [
+        //                     { $gt: ["$revenue", "$costs"] },
+        //                     { $subtract: ["$revenue", "$costs"] }, // Revenue - Costs
+        //                     0 // No profit if revenue <= costs
+        //                 ]
+        //             },
+        //             loss: {
+        //                 $cond: [
+        //                     { $gt: ["$costs", "$revenue"] },
+        //                     { $subtract: ["$costs", "$revenue"] }, 
+        //                     0 
+        //                 ]
+        //             },
+        //             profitMargin: {
+        //                 $multiply: [
+        //                     {
+        //                         $divide: [
+        //                             { $subtract: [{ $subtract: ["$revenue", "$discounts"] }, "$costs"] },
+        //                             { $cond: [{ $eq: ["$revenue", 0] }, 1, "$revenue"] }
+        //                         ]
+        //                     },
+        //                     100
+        //                 ]
+        //             }
+        //         }
+        //     },
+        //     { $sort: { month: 1 } }
+        // ]);
+
+        // // Fill missing months with 0 profit/loss if no data exists for that month
+        // const completeYearData = Array.from({ length: 12 }, (_, index) => {
+        //     const month = index + 1;
+        //     const existingData = yearlyData.find(data => data.month === month) || {};
+
+        //     return {
+        //         month,
+        //         monthName: [
+        //             'January', 'February', 'March', 'April',
+        //             'May', 'June', 'July', 'August',
+        //             'September', 'October', 'November', 'December'
+        //         ][index],
+        //         profit: existingData.profit || 0,
+        //         loss: existingData.loss || 0,
+        //         year: month > currentMonth ? currentYear + 1 : currentYear
+        //     };
+        // });
+
+        // // Calculate total profit and loss for the year
+        // const currentYearTotals = completeYearData.reduce((acc, curr) => ({
+        //     profit: acc.profit + curr.profit,
+        //     loss: acc.loss + curr.loss
+        // }), {
+        //     profit: 0,
+        //     loss: 0
+        // });
+
+        // const yearlyData = await Order.aggregate([
+        //     {
+        //         $match: {
+        //             createdAt: {
+        //                 $gte: new Date(`${currentYear}-01-01`),
+        //                 $lte: new Date(`${currentYear}-12-31`)
+        //             }
+        //         }
+        //     },
+        //     {
+        //         $project: {
+        //             year: { $year: "$createdAt" },
+        //             month: { $month: "$createdAt" },
+        //             orderStatus: 1,
+        //             totalAmount: 1,
+        //             discount: 1,
+        //             estimatedCost: { $multiply: ["$totalAmount", 0.7] }
+        //         }
+        //     },
+        //     {
+        //         $group: {
+        //             _id: {
+        //                 month: "$month"
+        //             },
+        //             revenue: {
+        //                 $sum: {
+        //                     $cond: [
+        //                         { $eq: ["$orderStatus", "Completed"] },
+        //                         "$totalAmount",
+        //                         0
+        //                     ]
+        //                 }
+        //             },
+        //             totalOrders: { $sum: 1 },
+        //             completedOrders: {
+        //                 $sum: {
+        //                     $cond: [
+        //                         { $eq: ["$orderStatus", "Completed"] },
+        //                         1,
+        //                         0
+        //                     ]
+        //                 }
+        //             },
+        //             cancelledOrders: {
+        //                 $sum: {
+        //                     $cond: [
+        //                         { $eq: ["$orderStatus", "Cancelled"] },
+        //                         1,
+        //                         0
+        //                     ]
+        //                 }
+        //             },
+        //             costs: {
+        //                 $sum: {
+        //                     $cond: [
+        //                         { $eq: ["$orderStatus", "Completed"] },
+        //                         "$estimatedCost",
+        //                         0
+        //                     ]
+        //                 }
+        //             },
+        //             discounts: { $sum: "$discount" }
+        //         }
+        //     },
+        //     {
+        //         $project: {
+        //             _id: 0,
+        //             month: "$_id.month",
+        //             monthName: {
+        //                 $let: {
+        //                     vars: {
+        //                         monthsInYear: [
+        //                             'January', 'February', 'March', 'April',
+        //                             'May', 'June', 'July', 'August',
+        //                             'September', 'October', 'November', 'December'
+        //                         ]
+        //                     },
+        //                     in: {
+        //                         $arrayElemAt: ['$$monthsInYear', { $subtract: ['$_id.month', 1] }]
+        //                     }
+        //                 }
+        //             },
+        //             revenue: 1,
+        //             costs: 1,
+        //             discounts: 1,
+        //             totalOrders: 1,
+        //             completedOrders: 1,
+        //             cancelledOrders: 1,
+        //             profit: {
+        //                 $subtract: [
+        //                     { $subtract: ["$revenue", "$discounts"] },
+        //                     "$costs"
+        //                 ]
+        //             },
+        //             profitMargin: {
+        //                 $multiply: [
+        //                     {
+        //                         $divide: [
+        //                             { $subtract: [{ $subtract: ["$revenue", "$discounts"] }, "$costs"] },
+        //                             { $cond: [{ $eq: ["$revenue", 0] }, 1, "$revenue"] }
+        //                         ]
+        //                     },
+        //                     100
+        //                 ]
+        //             }
+        //         }
+        //     },
+        //     { $sort: { month: 1 } }
+        // ]);
+
+        // const completeYearData = Array.from({ length: 12 }, (_, index) => {
+        //     const month = index + 1;
+        //     const existingData = yearlyData.find(data => data.month === month) || {};
+
+        //     return {
+        //         month,
+        //         monthName: [
+        //             'January', 'February', 'March', 'April',
+        //             'May', 'June', 'July', 'August',
+        //             'September', 'October', 'November', 'December'
+        //         ][index],
+        //         profit: existingData.profit || 0,
+        //         year: month > currentMonth ? currentYear + 1 : currentYear
+        //     };
+        // });
+
+        // const currentYearTotals = completeYearData
+        //     .filter(data => !data.isNextYear)
+        //     .reduce((acc, curr) => ({
+        //         profit: acc.profit + curr.profit,
+        //     }), {
+        //         profit: 0
+        //     });

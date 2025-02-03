@@ -4,9 +4,9 @@ const Category = require('../models/categoryModels');
 const SubCategory = require('../models/subCategoryModels');
 const Order = require('../models/orderModels');
 const Product = require('../models/productModels');
-const SpecialDeals = require('../models/specialDealsModels');
+const specialDeals = require('../models/specialDealsModels');
 const jwt = require('jsonwebtoken')
-const MoreToExplore = require('../models/moreToExplore.models');
+const moreToExplore = require('../models/moreToExplore.models');
 const twilio = require('twilio')
 
 const accountSid = process.env.TWILIOACCOUNTSID
@@ -191,237 +191,19 @@ exports.deleteUserById = async (req, res) => {
 }
 
 exports.dashBoard = async (req, res) => {
-    // try {
-    //     // Fetch all necessary data
-    //     const categories = await Category.find({ status: true });
-    //     const subCategories = await SubCategory.find();
-    //     const specialDeals = await SpecialDeals.find();
-    //     const orders = await Order.find().populate('orderItems.productId');
-    //     const moreToExplores = await MoreToExplore.find();
-
-    //     // Helper function to find category or subcategory case-insensitively
-    //     const findCategoryOrSubcategory = (list, name) => {
-    //         console.log(list);
-    //         const normalizedName = name.trim().toLowerCase();
-    //         console.log(normalizedName);
-    //         return list.find(item =>
-    //             item.categoryName?.trim().toLowerCase() === normalizedName ||
-    //             item.subCategoryName?.trim().toLowerCase() === normalizedName
-    //         );
-    //     };
-
-    //     // Calculate product sales and best sellers
-    //     const productSales = {};
-    //     orders.forEach(order => {
-    //         order.orderItems.forEach(item => {
-    //             const { productId, quantity } = item;
-    //             if (!productSales[productId._id]) {
-    //                 productSales[productId._id] = { product: productId, totalQuantity: 0 };
-    //             }
-    //             productSales[productId._id].totalQuantity += quantity;
-    //         });
-    //     });
-
-    //     const bestSellers = Object.values(productSales)
-    //         .sort((a, b) => b.totalQuantity - a.totalQuantity)
-    //         .slice(0, 10);
-
-    //     const productIds = bestSellers.map(seller => seller.product._id);
-    //     const products = await Product.find({ _id: { $in: productIds } }).exec();
-
-    //     const bestSellingProducts = products.map(product => {
-    //         const salesData = bestSellers.find(seller => seller.product._id.toString() === product._id.toString());
-    //         return {
-    //             categoryId: product.categoryId,
-    //             productId: product._id,
-    //             productName: product.productName,
-    //             totalQuantity: salesData.totalQuantity,
-    //             price: product.price,
-    //             sales: product.sales,
-    //             productImage: product.productImage
-    //         };
-    //     });
-
-    //     // Prepare categorized data with flexible category and subcategory matching
-    //     const categorizedData = [
-    //         {
-    //             Name: "vegetablesAndFruits",
-    //             Type: "Category",
-    //             Item: categories.map(category => ({
-    //                 _id: category._id,
-    //                 categoryName: category.categoryName,
-    //                 categoryImage: category.categoryImage,
-    //                 vectorImage: category.vectorImage,
-    //                 status: category.status,
-    //                 createdAt: category.createdAt,
-    //                 updatedAt: category.updatedAt
-    //             }))
-    //         }
-    //     ];
-
-    //     // Dynamic sections based on categories and subcategories
-    //     const sectionsToFetch = [
-    //         { name: "Fresh Vegetables", type: "Product" },
-    //         { name: "Fresh Fruits", type: "Product" },
-    //         { name: "Groceries", type: "Product" }
-    //     ];
-
-    //     for (const section of sectionsToFetch) {
-    //         // Find matching category or subcategory
-    //         const matchedCategory = findCategoryOrSubcategory(categories, section.name);
-    //         const matchedSubCategory = findCategoryOrSubcategory(subCategories, section.name);
-
-    //         let sectionProducts = [];
-    //         if (matchedCategory) {
-    //             sectionProducts = await Product.find({
-    //                 categoryId: matchedCategory._id,
-    //                 status: true,
-    //                 visibility: "Published"
-    //             });
-    //         } else if (matchedSubCategory) {
-    //             sectionProducts = await Product.find({
-    //                 subCategoryId: matchedSubCategory._id,
-    //                 status: true,
-    //                 visibility: "Published"
-    //             });
-    //         }
-
-    //         // Only add section if products are found
-    //         if (sectionProducts.length > 0) {
-    //             categorizedData.push({
-    //                 Name: section.name.replace(/\s+/g, ''),
-    //                 Type: section.type,
-    //                 Item: sectionProducts.map(product => ({
-    //                     status: product.status,
-    //                     visibility: product.visibility || "Published",
-    //                     _id: product._id,
-    //                     productName: product.productName,
-    //                     categoryId: product.categoryId,
-    //                     subCategoryId: product.subCategoryId,
-    //                     productImage: product.productImage,
-    //                     description: product.description,
-    //                     price: product.price,
-    //                     discount: product.discount,
-    //                     quantity: product.quantity,
-    //                     createdAt: product.createdAt,
-    //                     updatedAt: product.updatedAt,
-    //                     totalPrice: product.price,
-    //                     weight: product.weight
-    //                 }))
-    //             });
-    //         }
-    //     }
-
-    //     // Add additional sections
-    //     categorizedData.push({
-    //         Name: "SpecialDeals",
-    //         Type: "Deals",
-    //         Item: specialDeals
-    //     }, {
-    //         Name: "BestSeller",
-    //         Type: "Product",
-    //         Item: bestSellingProducts
-    //     }, {
-    //         Name: "MoreToExplore",
-    //         Type: "Explore",
-    //         Item: moreToExplores
-    //     });
-
-    //     return res.status(200).json({
-    //         status: true,
-    //         success: true,
-    //         message: "Dashboard Data Found Successfully....",
-    //         data: categorizedData
-    //     });
-
-    // } catch (error) {
-    //     console.error(error);
-    //     return res.status(500).json({
-    //         status: 500,
-    //         success: false,
-    //         message: error.message
-    //     });
-    // }
-    // try {
-    //     const categories = await Category.find()
-
-    //     const subCategories = await SubCategory.find()
-
-    //     const SpecialDeals = await specialDeals.find();
-
-    //     const orders = await Order.find().populate('orderItems.productId')
-
-    //     const moreToExplores = await moreToExplore.find();
-
-    //     const productSales = {};
-
-    //     orders.forEach(order => {
-    //         order.orderItems.forEach(item => {
-    //             const { productId, quantity } = item;
-    //             if (!productSales[productId._id]) {
-    //                 productSales[productId._id] = { product: productId, totalQuantity: 0 };
-    //             }
-    //             productSales[productId._id].totalQuantity += quantity;
-    //         });
-    //     });
-
-    //     const bestSellers = Object.values(productSales)
-    //         .sort((a, b) => b.totalQuantity - a.totalQuantity)
-    //         .slice(0, 10);
-
-
-    //     const productIds = bestSellers.map(seller => seller.product._id);
-    //     const products = await Product.find({ _id: { $in: productIds } }).exec();
-
-    //     const bestSellingProducts = products.map(product => {
-    //         const salesData = bestSellers.find(seller => seller.product._id.toString() === product._id.toString());
-    //         return {
-    //             categoryId: product.categoryId,
-    //             productId: product._id,
-    //             productName: product.productName,
-    //             totalQuantity: salesData.totalQuantity,
-    //             price: product.price,
-    //             sales: product.sales,
-    //             productImage: product.productImage
-    //         };
-    //     });
-
-    //     const groceriesCategory = categories.find(cat => cat.categoryName.toLowerCase() === 'groceries');
-
-    //     const groceriesProducts = groceriesCategory ? await Product.find({ categoryId: groceriesCategory._id }).exec() : [];
-
-    //     const freshFruitsSubCategory = subCategories.find(subCat => subCat.subCategoryName.toLowerCase() === 'fresh fruits');
-
-    //     const freshFruitsProducts = freshFruitsSubCategory ? await Product.find({ subCategoryId: freshFruitsSubCategory._id }).exec() : [];
-
-    //     const freshVegetablesSubCategory = subCategories.find(subCat => subCat.subCategoryName.toLowerCase() === 'fresh vegitables');
-
-    //     const freshVegetablesProducts = freshVegetablesSubCategory ? await Product.find({ subCategoryId: freshVegetablesSubCategory._id }).exec() : [];
-
-    //     const categorizedData = {
-    //         vegetablesAndFruits: categories,
-    //         groceries: groceriesProducts,
-    //         SpecialDeals,
-    //         bestSeller: bestSellingProducts,
-    //         freshVegetables: freshVegetablesProducts,
-    //         freshFruits: freshFruitsProducts,
-    //         MoreToExplore: moreToExplores
-    //     };
-
-    //     return res.status(200).json({ status: 200, success: true, status: true, message: "DashBoard Data Found SuccessFully....", data: categorizedData });
-
-    // } catch (error) {
-    //     console.log(error)
-    //     return res.status(500).json({ status: 500, success: false, message: error.message })
-    // }
     try {
-        const categories = await Category.find();
-        const subCategories = await SubCategory.find();
-        const specialDeals = await SpecialDeals.find();
-        const orders = await Order.find().populate('orderItems.productId');
-        const moreToExplores = await MoreToExplore.find();
-        // Product Sales Calculation
+        const categories = await Category.find()
+
+        const subCategories = await SubCategory.find()
+
+        const SpecialDeals = await specialDeals.find();
+
+        const orders = await Order.find().populate('orderItems.productId')
+
+        const moreToExplores = await moreToExplore.find();
+
         const productSales = {};
+
         orders.forEach(order => {
             order.orderItems.forEach(item => {
                 const { productId, quantity } = item;
@@ -432,10 +214,10 @@ exports.dashBoard = async (req, res) => {
             });
         });
 
-        // Best Sellers
         const bestSellers = Object.values(productSales)
             .sort((a, b) => b.totalQuantity - a.totalQuantity)
             .slice(0, 10);
+
 
         const productIds = bestSellers.map(seller => seller.product._id);
         const products = await Product.find({ _id: { $in: productIds } }).exec();
@@ -449,54 +231,38 @@ exports.dashBoard = async (req, res) => {
                 totalQuantity: salesData.totalQuantity,
                 price: product.price,
                 sales: product.sales,
+                discount: product.discount,
                 productImage: product.productImage
             };
         });
 
+        const groceriesCategory = categories.find(cat => cat.categoryName.toLowerCase() === 'groceries');
 
-        const structuredData = [
-            {
-                Name: "vegetablesAndFruits",
-                Type: "Category",
-                Item: categories
-            },
-            {
-                Name: "groceries",
-                Type: "Product",
-                Item: await Product.find({ categoryId: categories.find(cat => cat.categoryName.toLowerCase() === 'groceries')?._id })
-            },
-            {
-                Name: "specialDeals",
-                Type: "Deals",
-                Item: specialDeals
-            },
-            {
-                Name: "BestSeller",
-                Type: "bestSeller",
-                Item: bestSellingProducts
-            },
-            {
-                Name: "freshVegetables",
-                Type: "Product",
-                Item: await Product.find({ subCategoryId: subCategories.find(subCat => subCat.subCategoryName.toLowerCase() === 'fresh vegetables')?._id })
-            },
-            {
-                Name: "freshFruits",
-                Type: "Product",
-                Item: await Product.find({ subCategoryId: subCategories.find(subCat => subCat.subCategoryName.toLowerCase() === 'fresh fruits')?._id })
-            },
-            {
-                Name: "moreToExplore",
-                Type: "Explore",
-                Item: moreToExplores
-            }
-        ];
+        const groceriesProducts = groceriesCategory ? await Product.find({ categoryId: groceriesCategory._id }).exec() : [];
 
-        return res.status(200).json({ status: 200, success: true, message: "DashBoard Data Found Successfully....", data: structuredData });
+        const freshFruitsSubCategory = subCategories.find(subCat => subCat.subCategoryName.toLowerCase() === 'fresh fruits');
+
+        const freshFruitsProducts = freshFruitsSubCategory ? await Product.find({ subCategoryId: freshFruitsSubCategory._id }).exec() : [];
+
+        const freshVegetablesSubCategory = subCategories.find(subCat => subCat.subCategoryName.toLowerCase() === 'fresh vegitables');
+
+        const freshVegetablesProducts = freshVegetablesSubCategory ? await Product.find({ subCategoryId: freshVegetablesSubCategory._id }).exec() : [];
+
+        const categorizedData = {
+            vegetablesAndFruits: categories,
+            groceries: groceriesProducts,
+            SpecialDeals,
+            bestSeller: bestSellingProducts,
+            freshVegetables: freshVegetablesProducts,
+            freshFruits: freshFruitsProducts,
+            MoreToExplore: moreToExplores
+        };
+
+        return res.status(200).json({ status: 200, success: true, status: true, message: "DashBoard Data Found SuccessFully....", data: categorizedData });
 
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ status: 500, success: false, message: error.message });
+        console.log(error)
+        return res.status(500).json({ status: 500, success: false, message: error.message })
     }
 }
 
